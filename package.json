@@ -1,0 +1,21 @@
+{
+  "name": "music_visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A music visualizer",
+  "main": "src/server/server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Minh Le",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "method-override": "^2.3.7",
+    "morgan": "^1.8.1"
+  }
+}
