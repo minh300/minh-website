@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js webgl - scenes transition</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        margin: 0px;
+        overflow: hidden;
+    }
+    
+    .info {
+        position: absolute;
+        background-color: black;
+        opacity: 0.8;
+        color: white;
+        text-align: center;
+        top: 0px;
+        width: 100%;
+    }
+    
+    .info a {
+        color: #00ffff;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script src="../js/lib/three.js"></script>
+    <script src="../js/animation/crossfade/scenes.js"></script>
+    <script src="../js/animation/crossfade/SceneManager.js"></script>
+    <script src="../js/animation/controls/PointerLockControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+    <script>
+    var renderer;
+    var sceneManager;
+
+    var clock = new THREE.Clock();
+    var cameras = [];
+    var controls = [];
+    var scenes = [];
+    var SCENES_COUNT = 5;
+    var INTERSECTED;
+    var mouseDown = false;
+
+    var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+    if (havePointerLock) {
+        var element = document.body;
+        var pointerlockchange = function(event) {
+            if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
+                for (var i = 0; i < SCENES_COUNT; i++) {
+                    controls[i].enabled = true;
+                }
+            } else {
+                for (var i = 0; i < SCENES_COUNT; i++) {
+                    controls[i].enabled = false;
+                }
+            }
+        };
+
+        // Hook pointer lock state change events
+        document.addEventListener('pointerlockchange', pointerlockchange, false);
+        document.addEventListener('mozpointerlockchange', pointerlockchange, false);
+        document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
+
+    } else {
+        alert('Your browser doesn\'t seem to support Pointer Lock API');
+    }
+    init();
+    animate();
+
+    function init() {
+        for (var i = 0; i < SCENES_COUNT; i++) {
+            cameras[i] = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+            //controls[i] = new THREE.FirstPersonControls(cameras[i]);
+            controls[i] = new THREE.PointerLockControls(cameras[i]);
+            //controls[i] .movementSpeed = 100;
+            //controls[i] .lookSpeed = 0.1;
+        }
+
+        var container = document.getElementById("container");
+
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.sortObjects = false;
+        container.appendChild(renderer.domElement);
+
+        scenes.push(new Scene("mainScene", 0xFFFFFF, controls[0], cameras[0]));
+        scenes.push(new Scene("mainScene", 0x000000, controls[1], cameras[1]));
+        scenes.push(new Scene("mainScene", 0x0000FF, controls[2], cameras[2]));
+        scenes.push(new Scene("mainScene", 0xFF0000, controls[3], cameras[3]));
+        scenes.push(new Scene("mainScene", 0xFFFF00, controls[4], cameras[4]));
+
+        sceneManager = new SceneManager(scenes);
+    }
+
+    function animate() {
+
+        requestAnimationFrame(animate);
+        intersectionDetection();
+        updateControls();
+        render();
+        TWEEN.update();
+    }
+
+    function onMouseDown(event) {
+        mouseDown = true;
+
+    };
+
+    function onMouseUp(event) {
+        mouseDown = false;
+    };
+
+    document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mouseup', onMouseUp, false);
+
+
+    function intersectionDetection() {
+        if (!controls[currentScene].enabled && !transitionParams.animateTransition) {
+            var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 100);
+
+            raycaster.setFromCamera(mouse, cameras[currentScene]);
+            var intersects = raycaster.intersectObjects(scenes[currentScene].getObjects());
+            if (intersects.length > 0) {
+                if (INTERSECTED != intersects[0].object) {
+                    if (INTERSECTED) {
+                        INTERSECTED.resetAnimation();
+                    }
+                    INTERSECTED = intersects[0].object;
+                    INTERSECTED.onHover();
+                }
+                if (INTERSECTED.sceneID && mouseDown) {
+                    sceneManager.transitionTo(INTERSECTED.sceneID);
+                }
+            } else {
+                if (INTERSECTED) {
+                    INTERSECTED.resetAnimation();
+                }
+                INTERSECTED = null;
+            }
+        } else {
+            if (INTERSECTED) {
+                INTERSECTED.resetAnimation();
+            }
+            INTERSECTED = null;
+        }
+    }
+
+    function updateControls() {
+        for (var i = 0; i < SCENES_COUNT; i++) {
+            controls[i].update(clock.getDelta());
+        }
+    }
+
+    function render() {
+
+        sceneManager.render(clock.getDelta());
+
+    }
+    </script>
+</body>
+
+</html>
