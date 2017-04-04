@@ -10,17 +10,6 @@ var transitionParams = {
 
 var currentScene = 0;
 
-function onDocumentMouseMove(event) {
-    event.preventDefault();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
-
-var mouse = new THREE.Vector2();
-
-document.addEventListener('mousemove', onDocumentMouseMove, false);
-
-
 function SceneManager(scenes) {
 
     this.scene = new THREE.Scene();
@@ -114,111 +103,76 @@ function SceneManager(scenes) {
     this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
 
     this.needChange = false;
+}
 
-    this.setTextureThreshold = function(value) {
 
-        this.quadmaterial.uniforms.threshold.value = value;
+SceneManager.prototype.setTextureThreshold = function(value) {
 
+    this.quadmaterial.uniforms.threshold.value = value;
+
+};
+
+
+SceneManager.prototype.useTexture = function(value) {
+
+    this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
+
+};
+
+SceneManager.prototype.setTexture = function(i) {
+
+    this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
+
+};
+
+
+SceneManager.prototype.setNewSceneB = function(id) {
+    this.sceneB = this.scenes[id];
+    this.quadmaterial.uniforms.tDiffuse2.value = this.sceneB.fbo.texture;
+}
+
+
+SceneManager.prototype.setNewSceneA = function(id) {
+    this.sceneA = this.scenes[id];
+    this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
+}
+
+SceneManager.prototype.render = function(delta) {
+    // Transition animation
+    this.quadmaterial.uniforms.mixRatio.value = transitionParams.transition;
+
+    if (!transitionParams.animateTransition) {
+        this.scenes[currentScene].render(delta, false);
+        transitionParams.animateTransition = false;
+    } else {
+        // When 0<transition<1 render transition between two scenes
+        this.sceneA.render(delta, true);
+        this.sceneB.render(delta, true);
+        renderer.render(this.scene, this.cameraOrtho, null, true);
+    }
+}
+
+
+SceneManager.prototype.transitionTo = function(sceneID) {
+    var sceneManager = this;
+    sceneManager.setNewSceneB(sceneID);
+
+    var position = {
+        x: 1
     };
-
-    this.useTexture = function(value) {
-
-        this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
-
+    var target = {
+        x: 0
     };
+    var tween = new TWEEN.Tween(position).to(target, 2000);
 
-    this.setTexture = function(i) {
-
-        this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
-
-    };
-
-    this.setNewSceneB = function(id) {
-        this.sceneB = this.scenes[id];
-        this.quadmaterial.uniforms.tDiffuse2.value = this.sceneB.fbo.texture;
-    }
-
-    this.setNewSceneA = function(id) {
-        this.sceneA = this.scenes[id];
-        this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
-    }
-
-
-
-    this.render = function(delta) {
-
-        // Transition animation
-        this.quadmaterial.uniforms.mixRatio.value = transitionParams.transition;
-
-        if (!transitionParams.animateTransition) {
-            this.scenes[currentScene].render(delta, false);
-            transitionParams.animateTransition = false;
-        } else {
-            // When 0<transition<1 render transition between two scenes
-            this.sceneA.render(delta, true);
-            this.sceneB.render(delta, true);
-            renderer.render(this.scene, this.cameraOrtho, null, true);
-        }
-
-
-
-    }
-
-
-    this.onKeyUp = function(event) {
-        switch (event.keyCode) {
-            case 82: // r
-                var sceneManager = this;
-                sceneManager.setNewSceneB(currentScene == 0 ? 1 : 0);
-
-                var position = {
-                    x: 1
-                };
-                var target = {
-                    x: 0
-                };
-                var tween = new TWEEN.Tween(position).to(target, 2000);
-
-                tween.onUpdate(function() {
-                    transitionParams.animateTransition = true;
-                    transitionParams.transition = position.x;
-                });
-                tween.onComplete(function() {
-                    transitionParams.animateTransition = false;
-                    currentScene = currentScene == 0 ? 1 : 0;
-                    sceneManager.setNewSceneA(currentScene);
-                });
-                tween.start();
-                break;
-        }
-    }
-    var _onKeyUp = bind(this, this.onKeyUp);
-
-    this.transitionTo = function(sceneID) {
-        var sceneManager = this;
-        sceneManager.setNewSceneB(sceneID);
-
-        var position = {
-            x: 1
-        };
-        var target = {
-            x: 0
-        };
-        var tween = new TWEEN.Tween(position).to(target, 2000);
-
-        tween.onUpdate(function() {
-            transitionParams.animateTransition = true;
-            transitionParams.transition = position.x;
-        });
-        tween.onComplete(function() {
-            transitionParams.animateTransition = false;
-            currentScene = sceneID;
-            sceneManager.setNewSceneA(sceneID);
-        });
-        tween.start();
-    }
-
-    document.addEventListener('keyup', _onKeyUp, false);
-
-
+    tween.onUpdate(function() {
+        transitionParams.animateTransition = true;
+        transitionParams.transition = position.x;
+    });
+    tween.onComplete(function() {
+        transitionParams.animateTransition = false;
+        currentScene = sceneID;
+        sceneManager.setNewSceneA(sceneID);
+    });
+    tween.start();
 }

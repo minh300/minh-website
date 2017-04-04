@@ -1,5 +1,3 @@
-angular.module('mainApp', [])
-  .controller('MainController', ['$scope', function($scope) {
-  $scope.test = 'Hello World';
-
-}]);
+var app = angular.module('mainApp', [
+	'angular-scroll-animate'
+]);
