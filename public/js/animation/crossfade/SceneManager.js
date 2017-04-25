@@ -172,6 +172,7 @@ SceneManager.prototype.transitionTo = function(sceneID) {
     tween.onComplete(function() {
         transitionParams.animateTransition = false;
         currentScene = sceneID;
+        updateDataService(currentScene);
         sceneManager.setNewSceneA(sceneID);
     });
     tween.start();

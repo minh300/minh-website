@@ -172,9 +172,16 @@ THREE.PointerLockControls.prototype.onKeyUp = function(event) {
             tween.onComplete(function() {
                 transitionParams.animateTransition = false;
                 currentScene = currentScene == 0 ? 1 : 0;
+                updateDataService(currentScene);
                 sceneManager.setNewSceneA(currentScene);
             });
             tween.start();
+            break;
+        case 66:
+            ParticleSystemParams.keepBeat = !ParticleSystemParams.keepBeat;
+            break;
+        case 78:
+            ParticleSystemParams.hide = !ParticleSystemParams.hide;
             break;
     }
 
