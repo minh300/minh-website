@@ -15,9 +15,10 @@ THREE.PointerLockControls = function(camera) {
     this.canJump = false;
     this.prevTime = performance.now();
     this.velocity = new THREE.Vector3();
+    this.increaseDecay = false;
+    this.decreaseDecay = false;
 
     camera.rotation.set(0, 0, 0);
-
     this.pitchObject = new THREE.Object3D();
     this.pitchObject.add(camera);
 
@@ -142,47 +143,6 @@ THREE.PointerLockControls.prototype.onKeyUp = function(event) {
         case 68: // d
             this.moveRight = false;
             break;
-        case 70: //f
-            var element = document.body;
-            // audioManager.playSound('sounds/BlueFields.mp3');
-
-            // Ask the browser to lock the pointer
-            if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
-                document.exitPointerLock();
-            } else {
-                element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-                element.requestPointerLock();
-            }
-            break;
-        case 82: // r
-            sceneManager.setNewSceneB(currentScene == 0 ? 1 : 0);
-
-            var position = {
-                x: 1
-            };
-            var target = {
-                x: 0
-            };
-            var tween = new TWEEN.Tween(position).to(target, 2000);
-
-            tween.onUpdate(function() {
-                transitionParams.animateTransition = true;
-                transitionParams.transition = position.x;
-            });
-            tween.onComplete(function() {
-                transitionParams.animateTransition = false;
-                currentScene = currentScene == 0 ? 1 : 0;
-                updateDataService(currentScene);
-                sceneManager.setNewSceneA(currentScene);
-            });
-            tween.start();
-            break;
-        case 66:
-            ParticleSystemParams.keepBeat = !ParticleSystemParams.keepBeat;
-            break;
-        case 78:
-            ParticleSystemParams.hide = !ParticleSystemParams.hide;
-            break;
     }
 
 };
@@ -237,3 +197,89 @@ function bind(scope, fn) {
     };
 
 }
+
+var onKeyDown = function(event) {
+    switch (event.keyCode) {
+        case 49:
+            decreaseDecay = true;
+            break;
+        case 50:
+            increaseDecay = true;
+            break;
+    }
+}
+
+
+
+var onKeyUp = function(event) {
+    switch (event.keyCode) {
+        case 70: //f
+            var element = document.body;
+
+            // Ask the browser to lock the pointer
+            if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
+                document.exitPointerLock();
+            } else {
+                element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+                element.requestPointerLock();
+            }
+            break;
+        case 71: //g
+            if (!visualizerParams.transforming) {
+                visualizerParams.form = (visualizerParams.form + 1) % visualizerParams.forms;
+                visualizerParams.transforming = true;
+                var position = {
+                    x: 0
+                };
+                var target = {
+                    x: .95
+                };
+                var tween = new TWEEN.Tween(position).to(target, 1000);
+
+                tween.onUpdate(function() {
+                    visualizerParams.opacity = position.x;
+                });
+                tween.onComplete(function() {
+                    visualizerParams.transforming = false;
+                    visualizerParams.current = visualizerParams.form;
+                });
+                tween.start();
+            }
+            break;
+        case 82: // r
+            sceneManager.setNewSceneB(currentScene == 0 ? 1 : 0);
+
+            var position = {
+                x: 1
+            };
+            var target = {
+                x: 0
+            };
+            var tween = new TWEEN.Tween(position).to(target, 2000);
+
+            tween.onUpdate(function() {
+                transitionParams.animateTransition = true;
+                transitionParams.transition = position.x;
+            });
+            tween.onComplete(function() {
+                transitionParams.animateTransition = false;
+                currentScene = currentScene == 0 ? 1 : 0;
+                updateDataService("currentScene", currentScene);
+                sceneManager.setNewSceneA(currentScene);
+            });
+            tween.start();
+            break;
+        case 66: //b
+            visualizerParams.pulse = !visualizerParams.pulse;
+            break;
+        case 49: //1
+            decreaseDecay = false;
+            break;
+        case 50: //2
+            increaseDecay = false;
+            break;
+    }
+
+};
+document.addEventListener('keyup', onKeyUp, false);
+document.addEventListener('keydown', onKeyDown, false);

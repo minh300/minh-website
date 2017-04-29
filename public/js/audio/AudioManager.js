@@ -2,11 +2,37 @@ var FFTSIZE = 256;
 
 
 function AudioManager() {
-
     this.audioInfo = {};
     var sound;
+    var player = document.getElementById('player');
+    var audioCtx = new(window.AudioContext || window.webkitAudioContext);
+    var analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    player.crossOrigin = "anonymous";
+    var source = audioCtx.createMediaElementSource(player);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    this.analyser = analyser;
 
     this.playSound = function(path, listener, onCompletes) {
+
+        player.setAttribute('src', path);
+        var audioInfo = this.audioInfo;
+        var audioLoader = new THREE.AudioLoader();
+        var playOnComplete = function(){
+            player.play();
+        }
+        onCompletes.push(playOnComplete);
+        audioLoader.load(path, function(buffer) {
+            getTempo(buffer, audioInfo, onCompletes);
+            audioInfo.startTime = clock.getElapsedTime();
+        });
+
+
+
+    }
+
+    this.playSound2 = function(path, listener, onCompletes) {
         var audioLoader = new THREE.AudioLoader();
         if (sound) sound.stop();
         var listener = listener || new THREE.AudioListener();
@@ -16,8 +42,9 @@ function AudioManager() {
         audioLoader.load(path, function(buffer) {
             getTempo(buffer, audioInfo, onCompletes);
             sound.setBuffer(buffer);
-            sound.setVolume(0.5);
+            sound.setVolume(1);
             sound.play();
+            console.log(sound)
             audioInfo.startTime = clock.getElapsedTime()
         });
 
@@ -26,9 +53,7 @@ function AudioManager() {
     }
 
     this.isPlaying = function() {
-        if (sound) {
-            return sound.isPlaying;
-        }
+        return !player.paused;
     }
 
     this.pause = function() {
@@ -49,11 +74,39 @@ function AudioManager() {
             sound.play();
         }
     }
+
+    this.seek = function(time) {
+        if (sound) {
+            if (time > sound.buffer.duration) {
+                return;
+            }
+            sound.stop();
+            sound.startTime = time;
+            sound.context.currentTime = time;
+            console.log(sound)
+            sound.play();
+        }
+    }
+
+    this.getDuration = function() {
+        if (sound) {
+            console.log(sound)
+            return sound.buffer.duration;
+        }
+        return 0;
+    }
+
+    this.getCurrentTime = function() {
+        if (sound) {
+            return sound.context.currentTime;
+        }
+        return 0;
+    }
 }
-
-
-
+/*
 AudioManager.prototype.getAverageFrequency = function() {
+
+
     return this.analyser.getAverageFrequency();
 }
 
@@ -66,6 +119,30 @@ AudioManager.prototype.getByteTimeDomainData = function() {
 AudioManager.prototype.getByteFrequencyData = function() {
     var dataArray = new Uint8Array(this.analyser.analyser.frequencyBinCount);
     this.analyser.analyser.getByteFrequencyData(dataArray);
+    return dataArray;
+}
+
+*/
+AudioManager.prototype.getAverageFrequency = function() {
+    var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
+    var total = 0;
+    for (var i = 0; i < dataArray.length; i++) {
+        total += dataArray[i];
+    }
+
+    return total / dataArray.length; //this.analyser.getAverageFrequency();
+}
+
+AudioManager.prototype.getByteTimeDomainData = function() {
+    var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteTimeDomainData(dataArray);
+    return dataArray;
+}
+
+AudioManager.prototype.getByteFrequencyData = function() {
+    var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
     return dataArray;
 }
 
@@ -137,6 +214,8 @@ function getTempo(buffer, audioInfo, onCompletes) {
 
         audioInfo.ret = top[0].tempo;
         audioInfo.vol = avgVol / peaks.length;
+        audioInfo.duration = source.buffer.duration;
+        visualizerParams.decay = Math.max(top[0].tempo/107*1.5,1);
         if (onCompletes) {
             for (var i = 0; i < onCompletes.length; i++) {
                 onCompletes[i](audioInfo);

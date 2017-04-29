@@ -8,7 +8,7 @@ var transitionParams = {
     "textureThreshold": 0.3
 };
 
-var currentScene = 0;
+var currentScene = 1;
 
 function SceneManager(scenes) {
 
@@ -172,7 +172,7 @@ SceneManager.prototype.transitionTo = function(sceneID) {
     tween.onComplete(function() {
         transitionParams.animateTransition = false;
         currentScene = sceneID;
-        updateDataService(currentScene);
+        updateDataService("currentScene",currentScene);
         sceneManager.setNewSceneA(sceneID);
     });
     tween.start();

@@ -1,7 +1,3 @@
-var ParticleSystemParams = {
-    "keepBeat": true,
-    "hide": false
-};
 
 function ParticleSystem(wrapper) {
 	this.wrapper = wrapper;
@@ -96,7 +92,7 @@ ParticleSystem.prototype.update = function(audioData) {
 
         }
 
-        if (this.emitPosition.bottomBeat && ParticleSystemParams.keepBeat) {
+        if (this.emitPosition.bottomBeat && visualizerParams.pulse) {
             for (var pCount = (this.particleCount / this.totalWaves) * this.curWave; pCount < (this.particleCount / this.totalWaves) * this.curWave + (this.particleCount / this.totalWaves); pCount++) {
                 var particle = this.particles.vertices[pCount];
 
@@ -126,7 +122,7 @@ ParticleSystem.prototype.update = function(audioData) {
             particle.velocity.z += particle.acceleration.z;
             particle.velocity.y += particle.acceleration.y;
 
-            if (ParticleSystemParams.keepBeat && ((particle.direction.x > 0 && particle.velocity.x < 0 || particle.direction.x < 0 && particle.velocity.x > 0) || (particle.direction.z > 0 && particle.velocity.z < 0 || particle.direction.z < 0 && particle.velocity.z > 0))) {
+            if (visualizerParams.pulse && ((particle.direction.x > 0 && particle.velocity.x < 0 || particle.direction.x < 0 && particle.velocity.x > 0) || (particle.direction.z > 0 && particle.velocity.z < 0 || particle.direction.z < 0 && particle.velocity.z > 0))) {
                 particle.x = 0; //Math.random() * particle.radius * particle.direction.x;
                 particle.z = 0; //Math.random() * particle.radius * particle.direction.z;
                 particle.y = 250;
