@@ -8,7 +8,8 @@ var updateDataService = function(key, value) {
     elem.scope().$apply();
 }
 
-var MainController = function($scope, $rootScope, $document, $http, $interval, $timeout, dataService) {
+var MainController = function($scope, $rootScope, $document, $http, $interval, $timeout, $uibModal, $log, dataService) {
+    $scope.dataService = dataService;
 
     $http({ method: 'GET', url: "../musicList" }).
     then(function(response) {
@@ -19,45 +20,58 @@ var MainController = function($scope, $rootScope, $document, $http, $interval, $
         $scope.status = response.status;
     });
 
+    $scope.open = function() {
+        var modalInstance = $uibModal.open({
+            templateUrl: '../html/info.html',
+            size: 'sm'
+        });
+
+        modalInstance.result.then(function(selectedItem) {}, function() {});
+    };
+
+    $scope.open();
+
+    $scope.isMusicScene = function() {
+        return $scope.dataService.currentScene==1;
+    }
+
     $scope.play = function() {
-        var scene = scenes[1].scene;
-        var visuals = ["staff", "heart", "spiral", "fountain", "flower"];
-        var selectedObject;
-        for (var i = 0; i < visuals.length; i++) {
-            selectedObject = scene.getObjectByName(visuals[i]);
-            scene.remove(selectedObject);
+        if ($scope.selected) {
+            var scene = sceneManager.getCurrentScene();
+            if (scene.name === "MusicScene") {
+                audioManager.playSound('music/' + $scope.selected, undefined, [bind(scene.particleSystem, scene.particleSystem.onCompleteParticleSystem),bind(scene, scene.onMusicLoaded)]);
+            }
         }
-
-        selectedObject = scene.getObjectByName("particleSystem");
-        scene.remove(selectedObject);
-
-        audioManager.playSound('music/' + $scope.selected, undefined, [bind(scenes[1].particleSystem, scenes[1].particleSystem.onCompleteParticleSystem), bind(scenes[1], scenes[1].onCompleteCircles)]);
     }
 
     $scope.toggleHide = function(element) {
         var element = document.getElementById(element);
-        if (element.className == 'hidden') {
+        if (element.className == 'myHidden') {
             element.className = '';
         } else {
-            element.className = 'hidden';
+            element.className = 'myHidden';
         }
     }
 
     var onKeyUp = function(event) {
         switch (event.keyCode) {
+            case 27: //ESC
+                $scope.open();
+                break;
             case 81: //q
                 $scope.toggleHide("visualControls");
                 break;
             case 90: //z
                 $scope.toggleHide("controlPanel");
                 break;
+
         }
 
     };
 
     document.addEventListener('keyup', onKeyUp, false);
 
-    $scope.dataService = dataService;
 };
+
 
 angular.module('mainApp').controller('MainController', MainController);

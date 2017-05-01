@@ -70,7 +70,7 @@ a:active {
     overflow: hidden;
 }
 
-#controlPanel.hidden {
+#controlPanel.myHidden {
     max-height: 52px;
 }
 
@@ -81,7 +81,7 @@ a:active {
 
 #tab>a {
     background-color: rgba(255, 255, 255, 0.15);
-    padding: 7px 10px 3px 10px;
+    padding: 7px 10px 7px 10px;
 }
 
 #playerControls {
@@ -98,10 +98,12 @@ a:active {
     position: absolute;
     right: 0px;
 }
-#visualControls.hidden {
+#visualControls.myHidden {
   visibility: hidden
 }
-
+.c{
+    color:black;
+}
 #input {
     font-size: 20px;
     padding: 8px;

@@ -1,9 +1,7 @@
-var app = angular.module('mainApp', [
-
-]);
+var app = angular.module('mainApp', ['ui.bootstrap']);
 
 app.factory('dataService', function() {
     return {
-        currentScene: currentScene
+        currentScene: sceneManager.currentScene
     };
 });

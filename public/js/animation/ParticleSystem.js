@@ -44,28 +44,21 @@ function ParticleSystem(wrapper) {
 
     }
     // create the particle system
-    this.particleSystem = new THREE.Points(
+    this.obj = new THREE.Points(
         this.particles,
         this.pMaterial);
-    this.particleSystem.name = "particleSystem";
-    this.particleSystem.position.y = -50;
-    this.particleSystem.frustumCulled = false;
+    this.obj.name = "particleSystem";
+    this.obj.position.y = -50;
+    this.obj.frustumCulled = false;
 }
 
-ParticleSystem.prototype.reset = function() {
-    for (var p = 0; p < this.particleCount; p++) {
-        var particle = this.particles.vertices[p];
-        particle.x = 100;
-        particle.z = 100;
-    }
-}
 
-ParticleSystem.prototype.update = function(audioData) {
+ParticleSystem.prototype.update = function(audioData,pulse) {
     if (audioManager.isPlaying()) {
         var avgFrequency = audioManager.getAverageFrequency();
 
         var total = 0;
-        for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+        for (var i = 0; i < 80; i++) {
             total += audioData[i];
         }
         var multipler = total / 10000;
@@ -76,8 +69,8 @@ ParticleSystem.prototype.update = function(audioData) {
 
             // check if we need to reset
             if ((Math.sqrt(Math.pow(particle.x, 2) + Math.pow(particle.y, 2) + Math.pow(particle.z, 2)) > particle.distance) && avgFrequency > 60) {
-                particle.x = 0; // Math.random() * 100;
-                particle.z = 0; //Math.random() * 100;
+                particle.x = 0; 
+                particle.z = 0; 
                 particle.y = 50;
                 particle.distance = 125 * multipler;
                 var theta = 2 * Math.PI * Math.random();
@@ -92,7 +85,7 @@ ParticleSystem.prototype.update = function(audioData) {
 
         }
 
-        if (this.emitPosition.bottomBeat && visualizerParams.pulse) {
+        if (this.emitPosition.bottomBeat && pulse) {
             for (var pCount = (this.particleCount / this.totalWaves) * this.curWave; pCount < (this.particleCount / this.totalWaves) * this.curWave + (this.particleCount / this.totalWaves); pCount++) {
                 var particle = this.particles.vertices[pCount];
 
@@ -122,7 +115,7 @@ ParticleSystem.prototype.update = function(audioData) {
             particle.velocity.z += particle.acceleration.z;
             particle.velocity.y += particle.acceleration.y;
 
-            if (visualizerParams.pulse && ((particle.direction.x > 0 && particle.velocity.x < 0 || particle.direction.x < 0 && particle.velocity.x > 0) || (particle.direction.z > 0 && particle.velocity.z < 0 || particle.direction.z < 0 && particle.velocity.z > 0))) {
+            if (pulse && ((particle.direction.x > 0 && particle.velocity.x < 0 || particle.direction.x < 0 && particle.velocity.x > 0) || (particle.direction.z > 0 && particle.velocity.z < 0 || particle.direction.z < 0 && particle.velocity.z > 0))) {
                 particle.x = 0; //Math.random() * particle.radius * particle.direction.x;
                 particle.z = 0; //Math.random() * particle.radius * particle.direction.z;
                 particle.y = 250;
@@ -139,56 +132,15 @@ ParticleSystem.prototype.update = function(audioData) {
     }
 }
 
-ParticleSystem.prototype.update2 = function(audioData) {
-    if (audioManager.isPlaying()) {
-
-        var total = 0;
-        for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
-            total += audioData[i];
-        }
-        var multipler = total / 10000;
-
-
-        for (var pCount = 0; pCount < this.particleCount; pCount++) {
-            // get the particle
-            var particle = this.particles.vertices[pCount];
-            // check if we need to reset
-            if (particle.y < 0) {
-
-                particle.x = Math.random() * 100 * (Math.random() > .5 ? 1 : -1);
-                particle.z = Math.random() * 100 * (Math.random() > .5 ? 1 : -1);
-                particle.y = 50;
-                var theta = 2 * Math.PI * Math.random();
-                var phi = Math.acos(2 * Math.random() - 1);
-                particle.velocity.x = (Math.sin(phi) * Math.cos(theta)) * 5 * multipler;
-                particle.velocity.y = 5 * multipler; //(Math.sin(phi) * Math.sin(theta)) * 5 * multipler;
-                particle.velocity.z = (Math.cos(phi)) * 5 * multipler;
-                particle.acceleration.x = 0;
-                particle.acceleration.z = 0;
-            }
-
-            particle.y -= particle.velocity.y * .1;
-
-        }
-
-
-        this.particles.verticesNeedUpdate = true;
-
-    }
-}
-
-
 
 ParticleSystem.prototype.onCompleteParticleSystem = function(audioInfo) {
-
-	this.wrapper.scene.add(this.particleSystem);
     if (this.tween) {
         this.tween.stop();
     }
     if (this.tween2) {
         this.tween2.stop();
     }
-    var bpmm = 1000 * 60 / audioInfo.ret;
+    var bpmm = 1000 * 60 / audioInfo.tempo;
     this.emitTopPosition.y = bpmm / 3;
 
     var target = this.emitTopPosition;

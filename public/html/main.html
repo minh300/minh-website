@@ -2,16 +2,31 @@
 <html lang="en">
 
 <head>
-    <title>three.js webgl - scenes transition</title>
+    <title>3D Music Visualizer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
 </head>
+<script src="../js/lib/angular.min.js"></script>
+<script src="../js/lib/angular-animate.min.js"></script>
+<script src="../js/lib/ui-bootstrap-tpls-2.5.0.min.js"></script>
+<script src="../js/lib/three.min.js"></script>
+<script src="../js/lib/Tween.min.js"></script>
+<script src="../js/lib/dat.gui.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/controllers/main-controller.js"></script>
+<script src="../js/audio/AudioManager.js"></script>
+<script src="../js/animation/ParticleSystem.js"></script>
+<script src="../js/animation/Scenes.js"></script>
+<script src="../js/animation/VisualObjects.js"></script>
+<script src="../js/animation/SceneManager.js"></script>
+<script src="../js/animation/controls/PointerLockControls.js"></script>
 
 <body ng-app="mainApp" ng-controller="MainController">
-    <div id="visualControls" ng-show="dataService.currentScene==1"> </div>
+    <div id="visualControls" ng-show="isMusicScene()"> </div>
     <div id="container"></div>
-    <div ng-show="dataService.currentScene==1" id="controlPanel">
+    <div ng-show="isMusicScene()" id="controlPanel">
         <div id="tab"><a href="#" ng-click="toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
         <div id="playerControls">
             <select id="input" ng-model="selected" ng-options="item for item in musicList"></select>
@@ -19,89 +34,59 @@
             <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
         </div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../js/controllers/main-controller.js"></script>
-    <script src="../js/lib/three.js"></script>
-    <script src="../js/lib/dat.gui.min.js"></script>
-    <script src="../js/audio/AudioManager.js"></script>
-    <script src="../js/animation/ParticleSystem.js"></script>
-    <script src="../js/animation/crossfade/scenes.js"></script>
-    <script src="../js/animation/crossfade/VisualObjects.js"></script>
-    <script src="../js/animation/crossfade/SceneManager.js"></script>
-    <script src="../js/animation/controls/PointerLockControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
     <script>
     var renderer;
     var sceneManager;
-
     var clock = new THREE.Clock();
-    var cameras = [];
-    var controls = [];
-    var scenes = [];
-    var SCENES_COUNT = 5;
-    var audioManager = new AudioManager();
+    var audioManager;
 
     init();
     animate();
 
-    function init() {
-        for (var i = 0; i < SCENES_COUNT; i++) {
-            cameras[i] = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-            controls[i] = new THREE.PointerLockControls(cameras[i]);
-        }
-
-        scenes.push(new Scene("mainScene", 0xFFFFFF, controls[0], cameras[0]));
-        scenes.push(new Scene("musicScene", 0x000000, controls[1], cameras[1]));
-        scenes.push(new Scene("mainScene", 0x0000FF, controls[2], cameras[2]));
-        scenes.push(new Scene("mainScene", 0xFF0000, controls[3], cameras[3]));
-        scenes.push(new Scene("mainScene", 0xFFFF00, controls[4], cameras[4]));
-
-        sceneManager = new SceneManager(scenes);
-
+    function initVisualControls() {
         var gui = new dat.GUI({
             autoPlace: false
         });
         var visualFolder = gui.addFolder('Visual controls');
+        var musicScene = sceneManager.getScene("MusicScene");
+        var visualizerParams = musicScene.visualizerParams;
         visualFolder.add(visualizerParams, 'decay').min(1.0).max(3.0).step(0.01).listen();
         visualFolder.add(visualizerParams, 'pulse', {
             on: true,
             off: false
+        }).onChange(function(value) {
+            musicScene.visualizerParams.pulse = (value == 'true');
         }).listen();
-        var formthing = visualFolder.add(visualizerParams, 'form', {
+
+        visualFolder.add(visualizerParams, 'form', {
             Staff: 0,
             Heart: 1,
             Spiral: 2,
-            Flower:3,
-            Fountain:4
-        });
-        formthing.onChange(function(value) {
-            if (!visualizerParams.transforming) {
-                visualizerParams.transforming = true;
-                var position = {
-                    x: 0
-                };
-                var target = {
-                    x: .95
-                };
-                var tween = new TWEEN.Tween(position).to(target, 1000);
+            Flower: 3,
+            Fountain: 4
+        }).onChange(function(value) {
+            musicScene.transformVisual(value);
+        }).listen();
 
-                tween.onUpdate(function() {
-                    visualizerParams.opacity = position.x;
-                });
-                tween.onComplete(function() {
-                    visualizerParams.transforming = false;
-                    visualizerParams.current = visualizerParams.form;
-                });
-                tween.start();
-            } else {
-                visualizerParams.form = visualizerParams.current;
-            }
-        });
-        formthing.listen();
+        visualFolder.add(visualizerParams, 'randomize', {
+            on: true,
+            off: false
+        }).onChange(function(value) {
+            musicScene.visualizerParams.randomize = (value == 'true');
+        }).listen();
+
+        visualFolder.add(visualizerParams, 'randomizeIntervals').min(1).max(60).step(1).listen();
+
         visualFolder.open();
+
         var customContainer = document.getElementById('visualControls');
         customContainer.appendChild(gui.domElement);
+    }
+
+    function init() {
+        sceneManager = new SceneManager();
+        audioManager = new AudioManager();
+        initVisualControls();
 
         var container = document.getElementById("container");
 
@@ -121,40 +106,13 @@
         var SCREEN_WIDTH = window.innerWidth;
         var SCREEN_HEIGHT = window.innerHeight;
         renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-        for (var i = 0; i < SCENES_COUNT; i++) {
-            cameras[i].aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-            cameras[i].updateProjectionMatrix();
-        }
+        sceneManager.resizeWindows(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     function animate() {
         requestAnimationFrame(animate);
-        updateControls();
         render();
         TWEEN.update();
-    }
-
-
-    function updateControls() {
-        for (var i = 0; i < SCENES_COUNT; i++) {
-            controls[i].update();
-        }
-        var delta = clock.getDelta();
-        if (increaseDecay && visualizerParams.decay < 3) {
-            visualizerParams.decay = visualizerParams.decay + 2 * delta;
-            if (visualizerParams.decay > 3) {
-                visualizerParams.decay = 3;
-            }
-        }
-
-        if (decreaseDecay && visualizerParams.decay > 1) {
-            visualizerParams.decay = visualizerParams.decay - 2 * delta;
-            if (visualizerParams.decay < 1) {
-                visualizerParams.decay = 1;
-            }
-        }
-
-
     }
 
     function render() {

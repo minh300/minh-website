@@ -23,7 +23,8 @@ THREE.PointerLockControls = function(camera) {
     this.pitchObject.add(camera);
 
     this.yawObject = new THREE.Object3D();
-    this.yawObject.position.y = 10;
+    this.yawObject.position.set(0, 11, 100);
+
     this.yawObject.add(this.pitchObject);
 
     this.enabled = false;
@@ -159,7 +160,7 @@ THREE.PointerLockControls.prototype.update = function() {
 
     var time = performance.now();
     var delta = (time - this.prevTime) / 1000;
-    if (!transitionParams.animateTransition) {
+    if (!sceneManager.animateTransition) {
 
         this.velocity.x -= this.velocity.x * 10.0 * delta;
         this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -198,16 +199,6 @@ function bind(scope, fn) {
 
 }
 
-var onKeyDown = function(event) {
-    switch (event.keyCode) {
-        case 49:
-            decreaseDecay = true;
-            break;
-        case 50:
-            increaseDecay = true;
-            break;
-    }
-}
 
 
 
@@ -224,62 +215,10 @@ var onKeyUp = function(event) {
                 element.requestPointerLock();
             }
             break;
-        case 71: //g
-            if (!visualizerParams.transforming) {
-                visualizerParams.form = (visualizerParams.form + 1) % visualizerParams.forms;
-                visualizerParams.transforming = true;
-                var position = {
-                    x: 0
-                };
-                var target = {
-                    x: .95
-                };
-                var tween = new TWEEN.Tween(position).to(target, 1000);
-
-                tween.onUpdate(function() {
-                    visualizerParams.opacity = position.x;
-                });
-                tween.onComplete(function() {
-                    visualizerParams.transforming = false;
-                    visualizerParams.current = visualizerParams.form;
-                });
-                tween.start();
-            }
-            break;
         case 82: // r
-            sceneManager.setNewSceneB(currentScene == 0 ? 1 : 0);
-
-            var position = {
-                x: 1
-            };
-            var target = {
-                x: 0
-            };
-            var tween = new TWEEN.Tween(position).to(target, 2000);
-
-            tween.onUpdate(function() {
-                transitionParams.animateTransition = true;
-                transitionParams.transition = position.x;
-            });
-            tween.onComplete(function() {
-                transitionParams.animateTransition = false;
-                currentScene = currentScene == 0 ? 1 : 0;
-                updateDataService("currentScene", currentScene);
-                sceneManager.setNewSceneA(currentScene);
-            });
-            tween.start();
-            break;
-        case 66: //b
-            visualizerParams.pulse = !visualizerParams.pulse;
-            break;
-        case 49: //1
-            decreaseDecay = false;
-            break;
-        case 50: //2
-            increaseDecay = false;
+            sceneManager.transitionTo(sceneManager.currentScene == 0 ? 1 : 0);
             break;
     }
 
 };
 document.addEventListener('keyup', onKeyUp, false);
-document.addEventListener('keydown', onKeyDown, false);

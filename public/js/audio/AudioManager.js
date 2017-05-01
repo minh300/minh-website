@@ -19,7 +19,7 @@ function AudioManager() {
         player.setAttribute('src', path);
         var audioInfo = this.audioInfo;
         var audioLoader = new THREE.AudioLoader();
-        var playOnComplete = function(){
+        var playOnComplete = function() {
             player.play();
         }
         onCompletes.push(playOnComplete);
@@ -56,46 +56,6 @@ function AudioManager() {
         return !player.paused;
     }
 
-    this.pause = function() {
-        if (sound) {
-            sound.pause();
-        }
-    }
-
-
-    this.stop = function() {
-        if (sound) {
-            sound.stop();
-        }
-    }
-
-    this.play = function() {
-        if (sound) {
-            sound.play();
-        }
-    }
-
-    this.seek = function(time) {
-        if (sound) {
-            if (time > sound.buffer.duration) {
-                return;
-            }
-            sound.stop();
-            sound.startTime = time;
-            sound.context.currentTime = time;
-            console.log(sound)
-            sound.play();
-        }
-    }
-
-    this.getDuration = function() {
-        if (sound) {
-            console.log(sound)
-            return sound.buffer.duration;
-        }
-        return 0;
-    }
-
     this.getCurrentTime = function() {
         if (sound) {
             return sound.context.currentTime;
@@ -123,15 +83,45 @@ AudioManager.prototype.getByteFrequencyData = function() {
 }
 
 */
+AudioManager.prototype.getBassVol = function() {
+    var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
+    var total = 0;
+    for (var i = 0, l = 3; i < l; i++) {
+        total += dataArray[i];
+    }
+
+    return total;
+}
+
+AudioManager.prototype.getLoudestSection = function() {
+    var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
+    var totals = [0, 0, 0, 0, 0];
+    for (var i = 0, l = dataArray.length; i < l; i++) {
+        var index = Math.floor((i / (l / 5)));
+        totals[index] += dataArray[i];
+    }
+    var loudestIndex = 0;
+    var loudest = 0;
+    for (var i = 0, l = totals.length; i < l; i++) {
+        if (totals[i] > loudest) {
+            loudestIndex = i;
+        }
+    }
+    return loudestIndex;
+
+}
+
 AudioManager.prototype.getAverageFrequency = function() {
     var dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
     var total = 0;
-    for (var i = 0; i < dataArray.length; i++) {
+    for (var i = 0, l = dataArray.length; i < l; i++) {
         total += dataArray[i];
     }
 
-    return total / dataArray.length; //this.analyser.getAverageFrequency();
+    return total / dataArray.length;
 }
 
 AudioManager.prototype.getByteTimeDomainData = function() {
@@ -146,9 +136,10 @@ AudioManager.prototype.getByteFrequencyData = function() {
     return dataArray;
 }
 
+
 AudioManager.prototype.onBeat = function() {
     var currentTime = (clock.getElapsedTime() - this.audioInfo.startTime) * 1000;
-    var ret = currentTime > (1000 * 60 / this.audioInfo.ret);
+    var ret = currentTime > (1000 * 60 / this.audioInfo.tempo);
     if (ret) {
         this.audioInfo.startTime = clock.getElapsedTime();
 
@@ -212,10 +203,10 @@ function getTempo(buffer, audioInfo, onCompletes) {
             return acc + val.volume;
         }, 0);
 
-        audioInfo.ret = top[0].tempo;
+        audioInfo.tempo = top[0].tempo;
         audioInfo.vol = avgVol / peaks.length;
         audioInfo.duration = source.buffer.duration;
-        visualizerParams.decay = Math.max(top[0].tempo/107*1.5,1);
+        audioInfo.decay = Math.max(top[0].tempo / 107 * 1.5, 1);
         if (onCompletes) {
             for (var i = 0; i < onCompletes.length; i++) {
                 onCompletes[i](audioInfo);
