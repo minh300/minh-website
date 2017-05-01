@@ -276,6 +276,7 @@ MusicScene.prototype.updateObjects = function(delta) {
 
 MusicScene.prototype.onMusicLoaded = function(audioInfo) {
     this.visualizerParams.decay = audioInfo.decay;
+    this.startTime = clock.getElapsedTime();
 }
 
 MusicScene.prototype.transformVisual = (function() {

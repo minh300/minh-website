@@ -32,14 +32,17 @@ var MainController = function($scope, $rootScope, $document, $http, $interval, $
     $scope.open();
 
     $scope.isMusicScene = function() {
-        return $scope.dataService.currentScene==1;
+        return $scope.dataService.currentScene == 1;
     }
 
     $scope.play = function() {
-        if ($scope.selected) {
+        var currentSelection = $scope.dataService.currentSong;
+        if (currentSelection) {
             var scene = sceneManager.getCurrentScene();
             if (scene.name === "MusicScene") {
-                audioManager.playSound('music/' + $scope.selected, undefined, [bind(scene.particleSystem, scene.particleSystem.onCompleteParticleSystem),bind(scene, scene.onMusicLoaded)]);
+                var playList = $scope.musicList.slice($scope.musicList.indexOf(currentSelection) + 1);
+                audioManager.playList = playList;
+                audioManager.playSound('music/' + currentSelection, undefined, [bind(scene.particleSystem, scene.particleSystem.onCompleteParticleSystem), bind(scene, scene.onMusicLoaded)]);
             }
         }
     }

@@ -29,7 +29,7 @@
     <div ng-show="isMusicScene()" id="controlPanel">
         <div id="tab"><a href="#" ng-click="toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
         <div id="playerControls">
-            <select id="input" ng-model="selected" ng-options="item for item in musicList"></select>
+            <select id="input" ng-model="dataService.currentSong" ng-options="item for item in musicList"></select>
             <button id="submit" ng-click="play()"> <i class="icon-play"></i></button>
             <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
         </div>

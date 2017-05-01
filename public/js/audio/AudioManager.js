@@ -13,6 +13,13 @@ function AudioManager() {
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
     this.analyser = analyser;
+    var self = this;
+    player.addEventListener('ended', function() {
+        self.playNext();
+    });
+
+    this.playList = [];
+    this.current = 0;
 
     this.playSound = function(path, listener, onCompletes) {
 
@@ -22,6 +29,7 @@ function AudioManager() {
         var playOnComplete = function() {
             player.play();
         }
+
         onCompletes.push(playOnComplete);
         audioLoader.load(path, function(buffer) {
             getTempo(buffer, audioInfo, onCompletes);
@@ -31,6 +39,17 @@ function AudioManager() {
 
 
     }
+
+    this.playNext = function() {
+        if (this.current < this.playList.length) {
+            var scene = sceneManager.getCurrentScene();
+            this.playSound('music/' + this.playList[this.current], undefined, [bind(scene.particleSystem, scene.particleSystem.onCompleteParticleSystem), bind(scene, scene.onMusicLoaded)]);
+            updateDataService("currentSong", this.playList[this.current]);
+            this.current++;
+        }
+    }
+
+
 
     this.playSound2 = function(path, listener, onCompletes) {
         var audioLoader = new THREE.AudioLoader();
