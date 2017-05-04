@@ -24,6 +24,10 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+    height: 100%;
+}
+
 .icon-play:before {
     content: "\e601";
 }
@@ -37,11 +41,6 @@
     margin: 0;
 }
 
-body {
-    background-color: #000000;
-    overflow: hidden;
-}
-
 a,
 a:visited {
     text-decoration: none;
@@ -53,8 +52,23 @@ a:active {
     color: #fff;
 }
 
-#info {
-    display: none;
+#world {
+    background-color: #000000;
+    overflow: hidden;
+}
+#about {
+}
+#home {
+}
+#project {
+}
+
+#portal {
+    margin-top:10%;
+}
+
+.mySection {
+    height: 100vh;
 }
 
 #controlPanel {
@@ -98,12 +112,15 @@ a:active {
     position: absolute;
     right: 0px;
 }
+
 #visualControls.myHidden {
-  visibility: hidden
+    visibility: hidden
 }
-.c{
-    color:black;
+
+.c {
+    color: black;
 }
+
 #input {
     font-size: 20px;
     padding: 8px;
@@ -133,11 +150,9 @@ a:active {
     width: 95%;
 }
 
-color: #666;
-
-}
 
 /* make some txt small for small screens */
+
 @media (max-width: 480px) {
     #input {
         font-size: 16px;

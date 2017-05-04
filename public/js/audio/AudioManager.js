@@ -22,7 +22,9 @@ function AudioManager() {
     this.current = 0;
 
     this.playSound = function(path, listener, onCompletes) {
-
+        if(this.player==undefined){
+            this.player
+        }
         player.setAttribute('src', path);
         var audioInfo = this.audioInfo;
         var audioLoader = new THREE.AudioLoader();
