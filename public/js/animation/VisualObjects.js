@@ -81,86 +81,97 @@ function SphericalObject(radius, count, heaxgonSize, opacity, name, pos) {
 
     addChildrenFromSphere(obj, radius, count, heaxgonSize, opacity);
     this.obj = obj;
+	this.topIndexFunction = function(i, l) {
+        return i;
+    };
+    this.botIndexFunction = function(i, l) {
+        return i;
+    };
+    this.rotationFunction = function(i, x) {
+        return x > 0 ? 1 : -1;
+    };
+	
+	this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
+		var total = 0;
+
+		for (var i = 0, l = dataArray.length / 2; i < l; i++) {
+			total += dataArray[i];
+			var topIndex = this.topIndexFunction(i, l);
+			var botIndex = this.botIndexFunction(i, l);
+			var inChild1 = this.obj.children[topIndex];
+			var inChild2 = this.obj.children[botIndex];
+
+			var val = Math.pow((dataArray[i] / 255), 2) * 255;
+			val *= i > 42 ? 1.1 : 1;
+			// establish the value for this tile
+			var scalar = avgFrequency > 60 ? 50 : 100;
+			var scaleVal = val / scalar;
+
+			if (scaleVal > inChild1.scalehigh) {
+				inChild1.scalehigh = val / scalar;
+			} else {
+				inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
+				scaleVal = inChild1.scalehigh;
+			}
+
+			if (scaleVal == 0) {
+				scaleVal = .01;
+			}
+
+			if (val > inChild1.high) {
+				inChild1.high = val;
+			} else {
+				inChild1.high -= inChild1.decay * decay;
+				val = inChild1.high;
+			}
+
+			inChild1.scale.set(scaleVal, scaleVal, scaleVal);
+			inChild2.scale.set(scaleVal, scaleVal, scaleVal);
+
+			// figure out what colour to fill it and then draw the polygon
+			if (val > 50) {
+				//color
+				var colors = getColors(val);
+				inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
+				inChild2.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
+
+
+				//rotations
+				if (avgFrequency > 60) {
+					inChild1.rotation.y = this.rotationFunction(inChild1.rotation.y, .01);
+					inChild2.rotation.y = this.rotationFunction(inChild1.rotation.y, -.01);
+				} else {
+					inChild1.rotation.y -= inChild1.decay / 500;
+					inChild2.rotation.y += inChild2.decay / 500;
+					if (inChild1.rotation.y < 0) {
+						inChild1.rotation.y = 0;
+					}
+					if (inChild2.rotation.y > 0) {
+						inChild2.rotation.y = 0;
+					}
+				}
+			} //end of val>50
+
+			if (transforming) {
+				if (to) {
+					inChild1.material.opacity = opacity;
+					inChild2.material.opacity = opacity;
+				} else {
+					inChild1.material.opacity = 1 - opacity;
+					inChild2.material.opacity = 1 - opacity;
+				}
+				inChild1.rotation.y = (2 * Math.PI) * opacity;
+				inChild2.rotation.y = -(2 * Math.PI) * opacity;
+			} else {
+				inChild1.material.opacity = .95;
+				inChild2.material.opacity = .95;
+			}
+		} //end of for
+	}
 
 }
 
-SphericalObject.prototype.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
-    var total = 0;
 
-    for (var i = 0, l = dataArray.length / 2; i < l; i++) {
-        total += dataArray[i];
-        var topIndex = this.topIndexFunction(i, l);
-        var botIndex = this.botIndexFunction(i, l);
-        var inChild1 = this.obj.children[topIndex];
-        var inChild2 = this.obj.children[botIndex];
-
-        var val = Math.pow((dataArray[i] / 255), 2) * 255;
-        val *= i > 42 ? 1.1 : 1;
-        // establish the value for this tile
-        var scalar = avgFrequency > 60 ? 50 : 100;
-        var scaleVal = val / scalar;
-
-        if (scaleVal > inChild1.scalehigh) {
-            inChild1.scalehigh = val / scalar;
-        } else {
-            inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
-            scaleVal = inChild1.scalehigh;
-        }
-
-        if (scaleVal == 0) {
-            scaleVal = .01;
-        }
-
-        if (val > inChild1.high) {
-            inChild1.high = val;
-        } else {
-            inChild1.high -= inChild1.decay * decay;
-            val = inChild1.high;
-        }
-
-        inChild1.scale.set(scaleVal, scaleVal, scaleVal);
-        inChild2.scale.set(scaleVal, scaleVal, scaleVal);
-
-        // figure out what colour to fill it and then draw the polygon
-        if (val > 50) {
-            //color
-            var colors = getColors(val);
-            inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
-            inChild2.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
-
-
-            //rotations
-            if (avgFrequency > 60) {
-                inChild1.rotation.y = this.rotationFunction(inChild1.rotation.y, .01);
-                inChild2.rotation.y = this.rotationFunction(inChild1.rotation.y, -.01);
-            } else {
-                inChild1.rotation.y -= inChild1.decay / 500;
-                inChild2.rotation.y += inChild2.decay / 500;
-                if (inChild1.rotation.y < 0) {
-                    inChild1.rotation.y = 0;
-                }
-                if (inChild2.rotation.y > 0) {
-                    inChild2.rotation.y = 0;
-                }
-            }
-        } //end of val>50
-
-        if (transforming) {
-            if (to) {
-                inChild1.material.opacity = opacity;
-                inChild2.material.opacity = opacity;
-            } else {
-                inChild1.material.opacity = 1 - opacity;
-                inChild2.material.opacity = 1 - opacity;
-            }
-            inChild1.rotation.y = (2 * Math.PI) * opacity;
-            inChild2.rotation.y = -(2 * Math.PI) * opacity;
-        } else {
-            inChild1.material.opacity = .95;
-            inChild2.material.opacity = .95;
-        }
-    } //end of for
-}
 
 
 
@@ -178,6 +189,7 @@ function Heart(radius, count, heaxgonSize, opacity, name) {
         return x > 0 ? 1 : -1;
     };
 }
+
 Heart.prototype = Object.create(SphericalObject.prototype);
 
 
@@ -193,9 +205,7 @@ Heart.prototype = Object.create(SphericalObject.prototype);
 function Staff(radius, count, heaxgonSize, opacity, name) {
     SphericalObject.call(this, radius, count, heaxgonSize, opacity, name);
     this.obj.rotation.z = (-Math.PI / 2);
-    this.topIndexFunction = function(i, l) {
-        return i;
-    };
+
     this.botIndexFunction = function(i, l) {
         return l * 2 - i - 1;
     };
@@ -203,6 +213,7 @@ function Staff(radius, count, heaxgonSize, opacity, name) {
         return i + x;
     };
 }
+
 Staff.prototype = Object.create(SphericalObject.prototype);
 
 
@@ -216,47 +227,48 @@ Staff.prototype = Object.create(SphericalObject.prototype);
 
 function OutterSphere(radius, count, heaxgonSize, opacity, name) {
     SphericalObject.call(this, radius, count, heaxgonSize, opacity, name);
+	this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
+		var total = 0;
+
+		for (var i = 0, l = dataArray.length / 2; i < l; i++) {
+			total += dataArray[i];
+			var topIndex = i + l;
+			var botIndex = l - i - 1;
+
+			var outChild1 = this.obj.children[topIndex];
+			var outChild2 = this.obj.children[botIndex];
+
+			var val = Math.pow((dataArray[i] / 255), 2) * 255;
+			val *= i > 42 ? 1.1 : 1;
+
+			if (val > outChild1.high) {
+				outChild1.high = val;
+			} else {
+				outChild1.high -= outChild1.decay *decay;
+				val = outChild1.high;
+			}
+
+			// figure out what colour to fill it and then draw the polygon
+			var r, g, b, a;
+			if (val > 50) {
+				//color
+				var colors = getColors(val);
+				outChild1.material.color.setRGB(Math.round(colors.r), Math.round(colors.g), Math.round(colors.b));
+				outChild2.material.color.setRGB(Math.round(colors.r), Math.round(colors.g), Math.round(colors.b));
+			} //end of val>50 
+		} //end of for
+		if (transforming) {
+
+			this.obj.rotation.y += .05;
+		} else {
+			this.obj.rotation.y += 0.005;
+
+		}
+	}
 }
+OutterSphere.prototype = Object.create(SphericalObject.prototype);
 
-OutterSphere.prototype.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
-    var total = 0;
 
-    for (var i = 0, l = dataArray.length / 2; i < l; i++) {
-        total += dataArray[i];
-        var topIndex = i + l;
-        var botIndex = l - i - 1;
-
-        var outChild1 = this.obj.children[topIndex];
-        var outChild2 = this.obj.children[botIndex];
-
-        var val = Math.pow((dataArray[i] / 255), 2) * 255;
-        val *= i > 42 ? 1.1 : 1;
-
-        if (val > outChild1.high) {
-            outChild1.high = val;
-        } else {
-            outChild1.high -= outChild1.decay *decay;
-            val = outChild1.high;
-        }
-
-        // figure out what colour to fill it and then draw the polygon
-        var r, g, b, a;
-        if (val > 50) {
-            //color
-            var colors = getColors(val);
-            outChild1.material.color.setRGB(Math.round(colors.r), Math.round(colors.g), Math.round(colors.b));
-            outChild2.material.color.setRGB(Math.round(colors.r), Math.round(colors.g), Math.round(colors.b));
-        } //end of val>50 
-    } //end of for
-    if (transforming) {
-
-        this.obj.rotation.y += .05;
-    } else {
-        this.obj.rotation.y += 0.005;
-
-    }
-
-}
 
 
 
@@ -275,9 +287,6 @@ function Flower(radius, count, heaxgonSize, opacity, name) {
     }
     this.obj.rotation.x = (Math.PI);
 
-    this.topIndexFunction = function(i, l) {
-        return i;
-    };
     this.botIndexFunction = function(i, l) {
         return l * 2 - i - 1;
     };
@@ -305,67 +314,70 @@ function Spiral(radius, count, heaxgonSize, opacity, name) {
         this.obj.children[i].visible = false;
     }
     this.obj.rotation.x = (-Math.PI / 2);
+	
+	this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
+
+		for (var i = 0, l = dataArray.length; i < l; i++) {
+			var inChild1 = this.obj.children[l - i - 1];
+
+			var val = Math.pow((dataArray[i] / 255), 2) * 255;
+			val *= i > 42 ? 1.1 : 1;
+			// establish the value for this tile
+			var scalar = avgFrequency > 60 ? 50 : 100;
+			var scaleVal = val / scalar;
+
+			if (scaleVal > inChild1.scalehigh) {
+				inChild1.scalehigh = val / scalar;
+			} else {
+				inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
+				scaleVal = inChild1.scalehigh;
+			}
+
+			if (scaleVal == 0) {
+				scaleVal = .01;
+			}
+
+			if (val > inChild1.high) {
+				inChild1.high = val;
+			} else {
+				inChild1.high -= inChild1.decay * decay;
+				val = inChild1.high;
+			}
+
+			inChild1.scale.set(scaleVal, scaleVal, scaleVal);
+
+			// figure out what colour to fill it and then draw the polygon
+			//color
+			var colors = getColors(val);
+			inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
+
+			//rotations
+			if (avgFrequency > 60) {
+				inChild1.rotation.y += .01;
+			} else {
+				inChild1.rotation.y -= inChild1.decay / 500;
+				if (inChild1.rotation.y < 0) {
+					inChild1.rotation.y = 0;
+				}
+			}
+
+			if (transforming) {
+				if (to) {
+					inChild1.material.opacity = opacity;
+				} else {
+					inChild1.material.opacity = 1 - opacity;
+				}
+				inChild1.rotation.y = (2 * Math.PI) * opacity;
+			} else {
+				inChild1.material.opacity = .95;
+			}
+		} //end of for
+
+	}
 }
 
-Spiral.prototype.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
+Spiral.prototype = Object.create(SphericalObject.prototype);
 
-    for (var i = 0, l = dataArray.length; i < l; i++) {
-        var inChild1 = this.obj.children[l - i - 1];
-
-        var val = Math.pow((dataArray[i] / 255), 2) * 255;
-        val *= i > 42 ? 1.1 : 1;
-        // establish the value for this tile
-        var scalar = avgFrequency > 60 ? 50 : 100;
-        var scaleVal = val / scalar;
-
-        if (scaleVal > inChild1.scalehigh) {
-            inChild1.scalehigh = val / scalar;
-        } else {
-            inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
-            scaleVal = inChild1.scalehigh;
-        }
-
-        if (scaleVal == 0) {
-            scaleVal = .01;
-        }
-
-        if (val > inChild1.high) {
-            inChild1.high = val;
-        } else {
-            inChild1.high -= inChild1.decay * decay;
-            val = inChild1.high;
-        }
-
-        inChild1.scale.set(scaleVal, scaleVal, scaleVal);
-
-        // figure out what colour to fill it and then draw the polygon
-        //color
-        var colors = getColors(val);
-        inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
-
-        //rotations
-        if (avgFrequency > 60) {
-            inChild1.rotation.y += .01;
-        } else {
-            inChild1.rotation.y -= inChild1.decay / 500;
-            if (inChild1.rotation.y < 0) {
-                inChild1.rotation.y = 0;
-            }
-        }
-
-        if (transforming) {
-            if (to) {
-                inChild1.material.opacity = opacity;
-            } else {
-                inChild1.material.opacity = 1 - opacity;
-            }
-            inChild1.rotation.y = (2 * Math.PI) * opacity;
-        } else {
-            inChild1.material.opacity = .95;
-        }
-    } //end of for
-
-}
 
 
 
@@ -408,66 +420,68 @@ function Fountain(radius, count, heaxgonSize, opacity, name) {
     obj.rotation.y = (Math.PI / 2);
 
     this.obj = obj;
+	
+	this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
+
+		for (var i = dataArray.length - 1, l = 0; i >= l; i--) {
+			var inChild1 = this.obj.children[i];
+
+			var val = Math.pow((dataArray[i] / 255), 2) * 255;
+			val *= i > 42 ? 1.1 : 1;
+			// establish the value for this tile
+			var scalar = avgFrequency > 60 ? 50 : 100;
+			var scaleVal = val / scalar;
+
+			if (scaleVal > inChild1.scalehigh) {
+				inChild1.scalehigh = val / scalar;
+			} else {
+				inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
+				scaleVal = inChild1.scalehigh;
+			}
+
+			if (scaleVal == 0) {
+				scaleVal = .01;
+			}
+
+			if (val > inChild1.high) {
+				inChild1.high = val;
+			} else {
+				inChild1.high -= inChild1.decay * decay;
+				val = inChild1.high;
+			}
+
+			inChild1.scale.set(scaleVal, scaleVal, scaleVal);
+			inChild1.position.y = inChild1.base + (scaleVal * val / 10);
+
+			// figure out what colour to fill it and then draw the polygon
+			//color
+			var colors = getColors(val);
+			inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
+
+			//rotations
+			if (avgFrequency > 60) {
+				inChild1.rotation.z += .01;
+			} else {
+				inChild1.rotation.z -= inChild1.decay / 500;
+				if (inChild1.rotation.z < 0) {
+					inChild1.rotation.z = 0;
+				}
+
+			}
+
+			if (transforming) {
+				if (to) {
+					inChild1.material.opacity = opacity;
+				} else {
+					inChild1.material.opacity = 1 - opacity;
+				}
+				inChild1.rotation.y = (2 * Math.PI) * opacity;
+			} else {
+				inChild1.material.opacity = .95;
+			}
+		} //end of for
+
+	}
 }
 
-Fountain.prototype.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
 
-    for (var i = dataArray.length - 1, l = 0; i >= l; i--) {
-        var inChild1 = this.obj.children[i];
-
-        var val = Math.pow((dataArray[i] / 255), 2) * 255;
-        val *= i > 42 ? 1.1 : 1;
-        // establish the value for this tile
-        var scalar = avgFrequency > 60 ? 50 : 100;
-        var scaleVal = val / scalar;
-
-        if (scaleVal > inChild1.scalehigh) {
-            inChild1.scalehigh = val / scalar;
-        } else {
-            inChild1.scalehigh = (inChild1.scalehigh * 100 - inChild1.decay * decay) / 100;
-            scaleVal = inChild1.scalehigh;
-        }
-
-        if (scaleVal == 0) {
-            scaleVal = .01;
-        }
-
-        if (val > inChild1.high) {
-            inChild1.high = val;
-        } else {
-            inChild1.high -= inChild1.decay * decay;
-            val = inChild1.high;
-        }
-
-        inChild1.scale.set(scaleVal, scaleVal, scaleVal);
-        inChild1.position.y = inChild1.base + (scaleVal * val / 10);
-
-        // figure out what colour to fill it and then draw the polygon
-        //color
-        var colors = getColors(val);
-        inChild1.material.color.setRGB(Math.round(colors.r) / 100, Math.round(colors.g) / 100, Math.round(colors.b) / 100);
-
-        //rotations
-        if (avgFrequency > 60) {
-            inChild1.rotation.z += .01;
-        } else {
-            inChild1.rotation.z -= inChild1.decay / 500;
-            if (inChild1.rotation.z < 0) {
-                inChild1.rotation.z = 0;
-            }
-
-        }
-
-        if (transforming) {
-            if (to) {
-                inChild1.material.opacity = opacity;
-            } else {
-                inChild1.material.opacity = 1 - opacity;
-            }
-            inChild1.rotation.y = (2 * Math.PI) * opacity;
-        } else {
-            inChild1.material.opacity = .95;
-        }
-    } //end of for
-
-}
