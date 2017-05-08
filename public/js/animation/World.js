@@ -3,11 +3,6 @@
     var clock = new THREE.Clock();
     var audioManager;
 
-    $(document).ready(function() {
-        init();
-        animate();
-    });
-
     function initVisualControls() {
         var gui = new dat.GUI({
             autoPlace: false

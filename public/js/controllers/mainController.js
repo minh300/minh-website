@@ -1,9 +1,9 @@
 'use strict';
 
-var MainController = function($scope, $rootScope, $document, $http, $interval, $timeout, $uibModal, $log) {
-
-    $scope.open = function() {
-        var modalInstance = $uibModal.open({
+var MainController = function( uibModal) {
+    var vm = this;
+    vm.open = function() {
+        var modalInstance = uibModal.open({
             templateUrl: '../html/info.html',
             size: 'sm'
         });
@@ -12,13 +12,15 @@ var MainController = function($scope, $rootScope, $document, $http, $interval, $
     };
 
 
-    $scope.showWorld = function() {
+    vm.showWorld = function() {
         var world = $('#world');
         var portal = $('#portal');
         var body = $('body');
         if (world.hasClass("hidden")) {
             body.css("overflow", "hidden");
-            $scope.open();
+            this.open();
+            init();
+            animate();
         } else {
             body.css("overflow", "visible");
         }
@@ -26,16 +28,10 @@ var MainController = function($scope, $rootScope, $document, $http, $interval, $
         portal.toggleClass("hidden");
     }
 
+    vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
 
-    $scope.scrollTo = function(id, $event) {
-        var container = $('html,body'),
-            scrollTo = $('#' + id);
-        container.animate({
-            scrollTop: scrollTo.offset().top - 100
-        }, "slow");
-
-    }
 };
 
+MainController['$inject'] = [ '$uibModal'];
 
 angular.module('mainApp').controller('MainController', MainController);

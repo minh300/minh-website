@@ -1,11 +1,22 @@
-app.directive("scroll", function($window) {
-    return function($scope, element, attrs) {
-        var sectionHeight = $("#home")[0].offsetHeight;
+app.directive("scroll", ['$window', function($window) {
+    return {
+        link: function($scope, element, attrs) {
+            var vm = $scope.vm;
+            var onScroll = function() {
+                var sectionHeight = $('.mySection').height();
+                var newIndex = Math.floor(this.pageYOffset / sectionHeight);
 
-        angular.element($window).bind("scroll", function() {
-            $scope.tabIndex = Math.floor(this.pageYOffset / sectionHeight);
-            $scope.$apply();
-        });
+                if (newIndex != vm.tabIndex) {
+                    vm.tabIndex = newIndex;
+                    $scope.$apply();
+                }
+            };
+
+            angular.element($window).on("scroll", onScroll);
+
+            $scope.$on('$destroy', function() {
+                angular.element($window).off('scroll', onScroll);
+            });
+        }
     };
-});
-
+}]);

@@ -6,7 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link href="../css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/bootstrap-theme.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css" rel="stylesheet">
     <script src="../js/lib/jquery-3.2.1.min.js"></script>
     <script src="../js/lib/angular.min.js"></script>
@@ -16,9 +15,10 @@
     <script src="../js/lib/Tween.min.js"></script>
     <script src="../js/lib/dat.gui.min.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/controllers/main-controller.js"></script>
-    <script src="../js/controllers/world-controller.js"></script>
+    <script src="../js/controllers/mainController.js"></script>
+    <script src="../js/controllers/worldController.js"></script>
     <script src="../js/directives/scroll.js"></script>
+    <script src="../js/directives/scrollTo.js"></script>
     <script src="../js/audio/AudioManager.js"></script>
     <script src="../js/animation/ParticleSystem.js"></script>
     <script src="../js/animation/Scenes.js"></script>
@@ -28,41 +28,40 @@
     <script src="../js/animation/World.js"></script>
 </head>
 
-<body ng-app="mainApp">
-    <div ng-controller="MainController">
-        <div scroll id="portal" class="container-fluid">
-            <uib-tabset class="navbar-inverse navbar-fixed-top" justified="true" active=tabIndex>
-                <uib-tab ng-click="scrollTo('home',$event)" index="0" heading="Home"></uib-tab>
-                <uib-tab ng-click="scrollTo('about',$event)" index="1" heading="About"></uib-tab>
-                <uib-tab ng-click="scrollTo('project',$event)" index="2" heading="Projects"></uib-tab>
-            </uib-tabset>
-            <div id="home" class="mySection col-md-8 col-md-offset-2">
-                <div class="h1 text-center">Home section..</div>
-                <button ng-click="showWorld()" index="0" > my button
-                </button>
-            </div>
-            <div id="about" class="mySection col-md-8 col-md-offset-2">
-                <div class="h1 text-center">About section..</div>
-            </div>
-            <div id="project" class="mySection col-md-8 col-md-offset-2">
-                <div class="h1 text-center">Project section..</div>
-            </div>
-            <div>
+<body ng-app="mainApp" ng-controller="MainController as vm">
+    <div id="portal" class="container-fluid">
+        <ul id="myNavigation" scroll class=" nav nav-tabs navbar-inverse navbar-fixed-top">
+            <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
+            <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
+            <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
+        </ul>
+        <div id="Home" class="mySection col-md-8 col-md-offset-2">
+            <h1 class="text-center">Home section..
+                    <button class="btn btn-primary" ng-click="vm.showWorld()" index="0"> Show World
+                    </button>
+                </h1>
+        </div>
+        <div id="About" class="mySection col-md-8 col-md-offset-2">
+            <h1 class="text-center">About section..</h1>
+        </div>
+        <div id="Projects" class="mySection col-md-8 col-md-offset-2">
+            <h1 class="text-center">Project section..</h1>
+        </div>
+        <div>
+        </div>
+    </div> -
+    < <div id="world" ng-controller="WorldController as vm" class="hidden">
+        <div id="visualControls" ng-show="vm.isMusicScene()"> </div>
+        <div id="container"></div>
+        <div ng-show="vm.isMusicScene()" id="controlPanel">
+            <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
+            <div id="playerControls">
+                <select id="input" ng-model="vm.dataService.currentSong" ng-options="item for item in vm.musicList"></select>
+                <button id="submit" ng-click="vm.play()"> <i class="icon-play"></i></button>
+                <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
             </div>
         </div>
-        <div id="world" ng-controller="WorldController" class="hidden">
-            <div id="visualControls" ng-show="isMusicScene()"> </div>
-            <div id="container"></div>
-            <div ng-show="isMusicScene()" id="controlPanel">
-                <div id="tab"><a href="#" ng-click="toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
-                <div id="playerControls">
-                    <select id="input" ng-model="dataService.currentSong" ng-options="item for item in musicList"></select>
-                    <button id="submit" ng-click="play()"> <i class="icon-play"></i></button>
-                    <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
-                </div>
-            </div>
         </div>
-    </div>
 </body>
 
 </html>

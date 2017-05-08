@@ -52,19 +52,29 @@ a:active {
     color: #fff;
 }
 
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+}
+
+.nav-tabs {
+    text-align:center;
+}
+
+
 #world {
     background-color: #000000;
     overflow: hidden;
 }
-#about {
-}
-#home {
-}
-#project {
-}
+
+#about {}
+
+#home {}
+
+#project {}
 
 #portal {
-    margin-top:10%;
+    margin-top: 10%;
 }
 
 .mySection {
