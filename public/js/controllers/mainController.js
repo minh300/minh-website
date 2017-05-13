@@ -1,6 +1,6 @@
 'use strict';
 
-var MainController = function( uibModal) {
+var MainController = function(uibModal) {
     var vm = this;
     vm.open = function() {
         var modalInstance = uibModal.open({
@@ -12,26 +12,19 @@ var MainController = function( uibModal) {
     };
 
 
-    vm.showWorld = function() {
-        var world = $('#world');
-        var portal = $('#portal');
-        var body = $('body');
-        if (world.hasClass("hidden")) {
-            body.css("overflow", "hidden");
-            this.open();
-            init();
-            animate();
-        } else {
-            body.css("overflow", "visible");
-        }
-        world.toggleClass("hidden");
-        portal.toggleClass("hidden");
-    }
-
     vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
 
 };
 
-MainController['$inject'] = [ '$uibModal'];
+MainController['$inject'] = ['$uibModal'];
 
 angular.module('mainApp').controller('MainController', MainController);
+
+
+function showWorld() {
+    var myNavigation = $('#myNavigation');
+    var notWorld = $('.notWorld');
+    var otherContainer = $('#otherContainer');
+    notWorld.toggleClass("myHidden");
+    sceneManager.enableControls(true);
+}

@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/animate.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css" rel="stylesheet">
     <script src="../js/lib/jquery-3.2.1.min.js"></script>
     <script src="../js/lib/angular.min.js"></script>
@@ -29,39 +30,37 @@
 </head>
 
 <body ng-app="mainApp" ng-controller="MainController as vm">
-    <div id="portal" class="container-fluid">
-        <ul id="myNavigation" scroll class=" nav nav-tabs navbar-inverse navbar-fixed-top">
-            <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
-            <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
-            <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
-        </ul>
-        <div id="Home" class="mySection col-md-8 col-md-offset-2">
-            <h1 class="text-center">Home section..
-                    <button class="btn btn-primary" ng-click="vm.showWorld()" index="0"> Show World
-                    </button>
-                </h1>
+    <div id="portal">
+        <div id="myNavigation" class="notWorld">
+            <ul class="nav nav-tabs navbar-inverse navbar-fixed-top">
+                <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
+                <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
+                <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
+            </ul>
         </div>
-        <div id="About" class="mySection col-md-8 col-md-offset-2">
-            <h1 class="text-center">About section..</h1>
-        </div>
-        <div id="Projects" class="mySection col-md-8 col-md-offset-2">
-            <h1 class="text-center">Project section..</h1>
-        </div>
-        <div>
-        </div>
-    </div> -
-    < <div id="world" ng-controller="WorldController as vm" class="hidden">
-        <div id="visualControls" ng-show="vm.isMusicScene()"> </div>
-        <div id="container"></div>
-        <div ng-show="vm.isMusicScene()" id="controlPanel">
-            <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
-            <div id="playerControls">
-                <select id="input" ng-model="vm.dataService.currentSong" ng-options="item for item in vm.musicList"></select>
-                <button id="submit" ng-click="vm.play()"> <i class="icon-play"></i></button>
-                <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
+        <div id="otherContainer" scroll class="mySection notWorld" >
+            <div id="Home" class="mySection">
+                <div id="Home2" class="myTitle">Home section..</div>
+            </div>
+            <div id="About" class="mySection">
+                <div class="myTitle">About section..</div>
+            </div>
+            <div id="Projects" class="mySection">
+                <div class="myTitle">Projects section..</div>
             </div>
         </div>
+        <div id="container" ng-controller="WorldController as vm">
+            <div id="visualControls" class="hidden"> </div>
+            <div id="controlPanel" class="hidden">
+                <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
+                <div id="playerControls">
+                    <select id="input" ng-model="vm.dataService.currentSong" ng-options="item for item in vm.musicList"></select>
+                    <button id="submit" ng-click="vm.play()"> <i class="icon-play"></i></button>
+                    <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
+                </div>
+            </div>
         </div>
+    </div>
 </body>
 
 </html>

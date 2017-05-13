@@ -2,11 +2,11 @@ app.directive("scrollTo", function() {
 
     return {
         link: function($scope, element, attrs) {
-            var container = $('html,body'),
-                scrollTo = $('#' + attrs.heading);
+            var container = $('#otherContainer'),
+                scrollTo = $('#' + attrs.heading)[0];
             element.on("click", function() {
                 container.animate({
-                    scrollTop: scrollTo.offset().top - 100
+                    scrollTop: scrollTo.offsetTop
                 }, "slow");
             });
         }

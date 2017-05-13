@@ -50,9 +50,11 @@ var WorldController = function(scope, http, dataService) {
                 break;
             case 81: //q
                 vm.toggleHide("visualControls");
+                vm.toggleHide("controlPanel");
                 break;
             case 90: //z
-                vm.toggleHide("controlPanel");
+               // vm.toggleHide("controlPanel");
+               showWorld();
                 break;
 
         }

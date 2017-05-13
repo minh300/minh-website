@@ -1,4 +1,3 @@
-
 function SceneManager(scenes) {
 
     this.scene = new THREE.Scene();
@@ -85,18 +84,32 @@ function SceneManager(scenes) {
     this.quad = new THREE.Mesh(quadgeometry, this.quadmaterial);
     this.scene.add(this.quad);
     this.animateTransition = false;
-    this.currentScene = 1;
+    this.currentScene = 0;
     // Link both scenes and their FBOs
     var scenes = [];
-    scenes.push(new MainScene(0xFFFFFF));
-    scenes.push(new MusicScene(0x000000));
-    scenes.push(new MainScene(0x0000FF));
-    scenes.push(new MainScene(0xFF0000));
-    scenes.push(new MainScene(0xFFFF00));
+    scenes.push(new MainScene(0, 0xFFFFFF));
+    scenes.push(new MainScene(1, 0x0000FF));
+    scenes.push(new MainScene(2, 0xFF0000));
+    scenes.push(new MainScene(3, 0xFFFF00));
+    scenes.push(new MusicScene(4, 0x000000));
+
     this.scenes = scenes;
     this.sceneA = scenes[this.currentScene];
 
     this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
+    this.transitionBuffer = -1;
+}
+
+SceneManager.prototype.moveTo = function(x, y, z) {
+    for (var i = 0; i < this.scenes.length; i++) {
+        this.scenes[i].moveTo(x, y, z);
+    }
+}
+
+SceneManager.prototype.enableControls = function(enable) {
+    for (var i = 0; i < this.scenes.length; i++) {
+        this.scenes[i].enableControls(enable);
+    }
 }
 
 SceneManager.prototype.currentIsMusicScene = function() {
@@ -174,24 +187,49 @@ SceneManager.prototype.render = function(delta) {
 
 
 SceneManager.prototype.transitionTo = function(sceneID) {
-    var sceneManager = this;
-    sceneManager.setNewSceneB(sceneID);
+    if (sceneID === this.sceneA.id) {
+        return;
+    }
+    if (false && this.animateTransition) {
+        // this.transitionBuffer = sceneID;
+    } else {
+        if (this.tween) {
+            this.tween.stop();
+        }
+        var sceneManager = this;
+        sceneManager.setNewSceneB(sceneID);
+        if (this.scenes[sceneID].name !== "MusicScene") {
+            $('#visualControls').addClass("hidden");
+            $('#controlPanel').addClass("hidden");
+        }
 
-    var position = {
-        x: 1
-    };
-    var target = {
-        x: 0
-    };
-    var tween = new TWEEN.Tween(position).to(target, 2000);
+        var position = {
+            x: 1
+        };
+        var target = {
+            x: 0
+        };
+        this.tween = new TWEEN.Tween(position).to(target, 2000);
 
-    tween.onUpdate(function() {
-        sceneManager.animateTransition = true;
-        sceneManager.transition = position.x;
-    });
-    tween.onComplete(function() {
-        sceneManager.setNewSceneA(sceneID);
-        updateDataService("currentScene", sceneManager.currentScene);
-    });
-    tween.start();
+        this.tween.onUpdate(function() {
+            sceneManager.animateTransition = true;
+            sceneManager.transition = position.x;
+        });
+        this.tween.onComplete(function() {
+            sceneManager.setNewSceneA(sceneID);
+            if (sceneManager.scenes[sceneID].name === "MusicScene") {
+                $('#visualControls').removeClass("hidden");
+                $('#controlPanel').removeClass("hidden");
+            }
+            // sceneManager.checkTransitionBuffer();
+        });
+        this.tween.start();
+    }
+}
+
+SceneManager.prototype.checkTransitionBuffer = function() {
+    if (this.transitionBuffer !== -1) {
+        this.transitionTo(this.transitionBuffer);
+        this.transitionBuffer = -1;
+    }
 }

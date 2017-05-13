@@ -28,6 +28,7 @@ THREE.PointerLockControls = function(camera) {
     this.yawObject.add(this.pitchObject);
 
     this.enabled = false;
+    this.pointerLockEnabled = false;
 
     this.getDirection = function() {
 
@@ -79,16 +80,16 @@ THREE.PointerLockControls.prototype.pointerlockchange = function(event) {
     var element = document.body;
 
     if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
-        this.enabled = true;
+        this.pointerLockEnabled = true;
     } else {
-        this.enabled = false;
+        this.pointerLockEnabled = false;
     }
 };
 
 THREE.PointerLockControls.prototype.onMouseMove = function(event) {
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    if (this.enabled === false) return;
+    if (this.pointerLockEnabled === false) return;
 
     var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
     var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
@@ -101,6 +102,8 @@ THREE.PointerLockControls.prototype.onMouseMove = function(event) {
 };
 
 THREE.PointerLockControls.prototype.onKeyDown = function(event) {
+    if (this.enabled === false) return;
+
     switch (event.keyCode) {
 
         case 38: // up
@@ -127,6 +130,8 @@ THREE.PointerLockControls.prototype.onKeyDown = function(event) {
 
 };
 THREE.PointerLockControls.prototype.onKeyUp = function(event) {
+    if (this.enabled === false) return;
+
     switch (event.keyCode) {
         case 38: // up
         case 87: // w
@@ -144,8 +149,21 @@ THREE.PointerLockControls.prototype.onKeyUp = function(event) {
         case 68: // d
             this.moveRight = false;
             break;
-    }
+        case 70: //f
+            var element = document.body;
 
+            // Ask the browser to lock the pointer
+            if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
+                document.exitPointerLock();
+            } else {
+                element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+                element.requestPointerLock();
+            }
+            break;
+        case 82: // r
+            sceneManager.transitionTo(sceneManager.currentScene == 0 ? 4 : 0);
+            break;
+    }
 };
 
 THREE.PointerLockControls.prototype.onMouseDown = function(event) {
@@ -157,6 +175,7 @@ THREE.PointerLockControls.prototype.onMouseUp = function(event) {
 };
 
 THREE.PointerLockControls.prototype.update = function() {
+    if (this.enabled === false) return;
 
     var time = performance.now();
     var delta = (time - this.prevTime) / 1000;
@@ -188,6 +207,9 @@ THREE.PointerLockControls.prototype.update = function() {
     }
     this.prevTime = time;
 }
+THREE.PointerLockControls.prototype.moveTo = function(x, y, z) {
+    this.moveForward=true;
+};
 
 function bind(scope, fn) {
 
@@ -198,27 +220,3 @@ function bind(scope, fn) {
     };
 
 }
-
-
-
-
-var onKeyUp = function(event) {
-    switch (event.keyCode) {
-        case 70: //f
-            var element = document.body;
-
-            // Ask the browser to lock the pointer
-            if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
-                document.exitPointerLock();
-            } else {
-                element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-                element.requestPointerLock();
-            }
-            break;
-        case 82: // r
-            sceneManager.transitionTo(sceneManager.currentScene == 0 ? 1 : 0);
-            break;
-    }
-
-};
-document.addEventListener('keyup', onKeyUp, false);

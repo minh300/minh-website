@@ -1,5 +1,5 @@
-function MainScene(clearColor, controls, camera) {
-    Scene.call(this, clearColor, controls, camera);
+function MainScene(id,clearColor, controls, camera) {
+    Scene.call(this,id, clearColor, controls, camera);
     this.name = "MainScene";
 
     this.scene.fog = new THREE.Fog(clearColor, 0, 120);
@@ -143,8 +143,8 @@ function addObject(wrapper, objYaw, x, y, z, sceneID) {
 
 
 
-function MusicScene(clearColor, controls, camera) {
-    Scene.call(this, clearColor, controls, camera);
+function MusicScene(id,clearColor, controls, camera) {
+    Scene.call(this,id, clearColor, controls, camera);
     this.name = "MusicScene";
     this.scene.fog = new THREE.Fog(clearColor, 0, 400);
 
@@ -338,7 +338,8 @@ MusicScene.prototype.updateDecay = function(delta) {
 
 
 
-function Scene(clearColor) {
+function Scene(id,clearColor) {
+    this.id = id;
     this.clearColor = clearColor;
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
     this.controls = new THREE.PointerLockControls(this.camera);
@@ -353,6 +354,14 @@ function Scene(clearColor) {
     this.objects = [];
     var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
     this.fbo = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, renderTargetParameters);
+}
+
+
+Scene.prototype.moveTo = function(x, y, z) {
+    this.controls.moveTo(x, y, z);
+}
+Scene.prototype.enableControls = function(enable) {
+    this.controls.enabled = !this.controls.enabled;
 }
 
 Scene.prototype.resizeWindow = function(width, height) {
@@ -373,7 +382,7 @@ Scene.prototype.render = function(delta, rtt) {
 };
 
 Scene.prototype.checkIntersection = function() {
-    if (!this.controls.enabled && !sceneManager.animateTransition) {
+    if (!this.controls.pointerLockEnabled && !sceneManager.animateTransition) {
         var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 100);
 
         raycaster.setFromCamera(this.controls.mouse, this.camera);

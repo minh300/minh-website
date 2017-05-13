@@ -25,7 +25,7 @@
 }
 
 body {
-    height: 100%;
+    overflow: hidden;
 }
 
 .icon-play:before {
@@ -52,33 +52,75 @@ a:active {
     color: #fff;
 }
 
-.nav-tabs > li, .nav-pills > li {
-    float:none;
-    display:inline-block;
+.nav-tabs > li,
+.nav-pills > li {
+    float: none;
+    display: inline-block;
 }
 
 .nav-tabs {
-    text-align:center;
+    text-align: center;
 }
 
+#container {
+    position: relative;
+}
 
-#world {
-    background-color: #000000;
+#otherContainer {
+    z-index: 50;
+    width: 100%;
+    position: absolute;
+    overflow: auto;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
+}
+
+#otherContainer.myHidden {
+    opacity: 0;
     overflow: hidden;
 }
 
-#about {}
+#About {
+    background-color: rgba(255, 255, 255, .5);
+}
 
-#home {}
+#Home {}
 
-#project {}
+#Projects {
+    background-color: rgba(0, 255, 255, .5);
+}
 
 #portal {
-    margin-top: 10%;
+    -webkit-transition: 0.2s;
+    -moz-transition: 0.2s;
+    transition: 0.2s;
+}
+
+.myTitle {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 160px;
+    width: 100%;
+    text-align: center;
+    padding-top: 5%;
+}
+
+#myNavigation {
+    height: 42px;
+    width: 100%;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
+}
+
+#myNavigation.myHidden {
+    opacity: 0;
+    height: 0;
 }
 
 .mySection {
     height: 100vh;
+    width: 100%;
 }
 
 #controlPanel {

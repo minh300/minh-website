@@ -2,6 +2,10 @@
     var sceneManager;
     var clock = new THREE.Clock();
     var audioManager;
+    $(document).ready(function() {
+        init();
+        animate();
+    });
 
     function initVisualControls() {
         var gui = new dat.GUI({
@@ -54,6 +58,7 @@
             antialias: true
         });
         renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.setSize($(container).width(), $(container).height());
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.sortObjects = false;
         container.appendChild(renderer.domElement);
@@ -65,6 +70,9 @@
     function onWindowResize(event) {
         var SCREEN_WIDTH = window.innerWidth;
         var SCREEN_HEIGHT = window.innerHeight;
+        var container = document.getElementById("container");
+
+
         renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         sceneManager.resizeWindows(SCREEN_WIDTH, SCREEN_HEIGHT);
     }

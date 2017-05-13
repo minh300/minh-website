@@ -5,7 +5,7 @@ app.config(['$compileProvider', function ($compileProvider) {
 app.factory('dataService', ['$rootScope', function($rootScope) {
 
     var dataService = {};
-    dataService.currentScene = 1;
+    dataService.currentScene = 0;
     dataService.currentSong = "";
     dataService.update = function(key,value) {
         dataService[key] = value;
@@ -16,8 +16,17 @@ app.factory('dataService', ['$rootScope', function($rootScope) {
 }]);
 
 $(document).ready(function() {
-    $(".navbar-inverse ul li a").click(function(event) {
+    $("#myNavigation li a").click(function(event) {
         // Removes focus of the anchor link.
         $(this).blur();
     });
+});
+
+$.fn.extend({
+    animateCss: function (animationName) {
+        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+        this.addClass('animated ' + animationName).one(animationEnd, function() {
+            $(this).removeClass('animated ' + animationName);
+        });
+    }
 });
