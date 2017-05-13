@@ -4,7 +4,7 @@ var updateDataService = function(key, value) {
     var elem = angular.element(document.querySelector('[ng-controller="WorldController as vm"]'));
     var injector = elem.injector();
     var myService = injector.get('dataService');
-    myService.update(key,value);
+    myService.update(key, value);
 }
 
 
@@ -39,7 +39,7 @@ var WorldController = function(scope, http, dataService) {
     }
 
     vm.toggleHide = function(element) {
-        var element = $('#'+element);
+        var element = $('#' + element);
         element.toggleClass("myHidden");
     }
 
@@ -53,8 +53,8 @@ var WorldController = function(scope, http, dataService) {
                 vm.toggleHide("controlPanel");
                 break;
             case 90: //z
-               // vm.toggleHide("controlPanel");
-               showWorld();
+                // vm.toggleHide("controlPanel");
+                showWorld();
                 break;
 
         }
@@ -65,7 +65,7 @@ var WorldController = function(scope, http, dataService) {
 
 };
 
-WorldController['$inject'] = [ '$scope', '$http', 'dataService'];
+WorldController['$inject'] = ['$scope', '$http', 'dataService'];
 
 
 angular.module('mainApp').controller('WorldController', WorldController);

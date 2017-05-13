@@ -187,44 +187,44 @@ SceneManager.prototype.render = function(delta) {
 
 
 SceneManager.prototype.transitionTo = function(sceneID) {
-    if (sceneID === this.sceneA.id) {
+    if (this.animateTransition && this.specialAnimate) {
+        // this.transitionBuffer = sceneID;
         return;
     }
-    if (false && this.animateTransition) {
-        // this.transitionBuffer = sceneID;
-    } else {
-        if (this.tween) {
-            this.tween.stop();
-        }
-        var sceneManager = this;
-        sceneManager.setNewSceneB(sceneID);
-        if (this.scenes[sceneID].name !== "MusicScene") {
-            $('#visualControls').addClass("hidden");
-            $('#controlPanel').addClass("hidden");
-        }
 
-        var position = {
-            x: 1
-        };
-        var target = {
-            x: 0
-        };
-        this.tween = new TWEEN.Tween(position).to(target, 2000);
-
-        this.tween.onUpdate(function() {
-            sceneManager.animateTransition = true;
-            sceneManager.transition = position.x;
-        });
-        this.tween.onComplete(function() {
-            sceneManager.setNewSceneA(sceneID);
-            if (sceneManager.scenes[sceneID].name === "MusicScene") {
-                $('#visualControls').removeClass("hidden");
-                $('#controlPanel').removeClass("hidden");
-            }
-            // sceneManager.checkTransitionBuffer();
-        });
-        this.tween.start();
+    if (this.tween) {
+        this.tween.stop();
     }
+    var sceneManager = this;
+    sceneManager.setNewSceneB(sceneID);
+    if (this.scenes[sceneID].name !== "MusicScene") {
+        $('#visualControls').addClass("hidden");
+        $('#controlPanel').addClass("hidden");
+    }
+
+    var position = {
+        x: 1
+    };
+    var target = {
+        x: 0
+    };
+    this.tween = new TWEEN.Tween(position).to(target, 2000);
+
+    this.tween.onUpdate(function() {
+        sceneManager.animateTransition = true;
+        sceneManager.transition = position.x;
+    });
+    this.tween.onComplete(function() {
+        sceneManager.setNewSceneA(sceneID);
+        if (sceneManager.scenes[sceneID].name === "MusicScene") {
+            $('#visualControls').removeClass("hidden");
+            $('#controlPanel').removeClass("hidden");
+        }
+        sceneManager.specialAnimate = false;
+        // sceneManager.checkTransitionBuffer();
+    });
+    this.tween.start();
+
 }
 
 SceneManager.prototype.checkTransitionBuffer = function() {

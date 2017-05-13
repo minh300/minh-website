@@ -1,5 +1,5 @@
-function MainScene(id,clearColor, controls, camera) {
-    Scene.call(this,id, clearColor, controls, camera);
+function MainScene(id, clearColor, controls, camera) {
+    Scene.call(this, id, clearColor, controls, camera);
     this.name = "MainScene";
 
     this.scene.fog = new THREE.Fog(clearColor, 0, 120);
@@ -143,8 +143,8 @@ function addObject(wrapper, objYaw, x, y, z, sceneID) {
 
 
 
-function MusicScene(id,clearColor, controls, camera) {
-    Scene.call(this,id, clearColor, controls, camera);
+function MusicScene(id, clearColor, controls, camera) {
+    Scene.call(this, id, clearColor, controls, camera);
     this.name = "MusicScene";
     this.scene.fog = new THREE.Fog(clearColor, 0, 400);
 
@@ -338,7 +338,7 @@ MusicScene.prototype.updateDecay = function(delta) {
 
 
 
-function Scene(id,clearColor) {
+function Scene(id, clearColor) {
     this.id = id;
     this.clearColor = clearColor;
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
@@ -396,6 +396,9 @@ Scene.prototype.checkIntersection = function() {
                 this.INTERSECTED.onHover();
             }
             if (this.INTERSECTED.sceneID && this.controls.mouseDown) {
+                sceneManager.specialAnimate = true;
+                if(this.INTERSECTED.sceneID<3)
+                scrollTo(this.INTERSECTED.sceneID)
                 sceneManager.transitionTo(this.INTERSECTED.sceneID);
             }
         } else {

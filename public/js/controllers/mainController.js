@@ -25,6 +25,20 @@ function showWorld() {
     var myNavigation = $('#myNavigation');
     var notWorld = $('.notWorld');
     var otherContainer = $('#otherContainer');
-    notWorld.toggleClass("myHidden");
-    sceneManager.enableControls(true);
+    notWorld.toggleClass('myHidden');
+    sceneManager.enableControls(true); //right now its toggling
+    sceneManager.specialAnimate = true;
+    if (!notWorld.hasClass('myHidden')) {
+        scrollTo(sceneManager.animateTransition ? sceneManager.sceneB.id : sceneManager.getCurrentScene().id);
+    }
+
+}
+
+function scrollTo(index) {
+    var sections = ["#Home", "#About", "#Projects"];
+    var container = $('#otherContainer'),
+        scrollTo = $(sections[index])[0];
+    container.animate({
+        scrollTop: scrollTo.offsetTop
+    }, "slow");
 }
