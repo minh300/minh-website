@@ -14,6 +14,14 @@ var MainController = function(uibModal) {
 
     vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
 
+    vm.showWorld = function() {
+        var notWorld = $('.notWorld');
+        notWorld.addClass('myHidden');
+        var returnButton = $('#returnButton');
+        returnButton.removeClass('hidden');
+        sceneManager.enableControls(true);
+    }
+
 };
 
 MainController['$inject'] = ['$uibModal'];

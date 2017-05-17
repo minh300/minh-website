@@ -20,6 +20,7 @@
     <script src="../js/controllers/worldController.js"></script>
     <script src="../js/directives/scroll.js"></script>
     <script src="../js/directives/scrollTo.js"></script>
+    <script src="../js/directives/portal.js"></script>
     <script src="../js/audio/AudioManager.js"></script>
     <script src="../js/animation/ParticleSystem.js"></script>
     <script src="../js/animation/Scenes.js"></script>
@@ -32,24 +33,25 @@
 <body ng-app="mainApp" ng-controller="MainController as vm">
     <div id="portal">
         <div id="myNavigation" class="notWorld">
-            <ul class="nav nav-tabs navbar-inverse navbar-fixed-top">
+            <ul class="nav navbar-default nav-tabs">
                 <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
                 <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
                 <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
             </ul>
         </div>
-        <div id="otherContainer" scroll class="mySection notWorld" >
+        <div id="otherContainer" scroll class="notWorld">
             <div id="Home" class="mySection">
-                <div id="Home2" class="myTitle">Home section..</div>
+                <canvas portal id="portalCanvas" width="65" height="65" ng-click="vm.showWorld()"></canvas>
             </div>
             <div id="About" class="mySection">
                 <div class="myTitle">About section..</div>
             </div>
             <div id="Projects" class="mySection">
-                <div class="myTitle">Projects section..</div>
+                 <div class="myTitle">Projects section..</div>
             </div>
         </div>
         <div id="container" ng-controller="WorldController as vm">
+            <button id="returnButton" class="hidden glyphicon glyphicon-menu-down" ng-click="vm.hideWorld()"></button>
             <div id="visualControls" class="hidden"> </div>
             <div id="controlPanel" class="hidden">
                 <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>

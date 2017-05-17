@@ -44,7 +44,7 @@ body {
 a,
 a:visited {
     text-decoration: none;
-    color: #c6c6c6;
+    color: #754d2e;
 }
 
 a:hover,
@@ -52,8 +52,7 @@ a:active {
     color: #fff;
 }
 
-.nav-tabs > li,
-.nav-pills > li {
+.nav-tabs > li {
     float: none;
     display: inline-block;
 }
@@ -62,11 +61,104 @@ a:active {
     text-align: center;
 }
 
+.navbar-default {
+    background-color: #011f4b;
+    border-color: #6497b1;
+}
+
+.navbar-default .navbar-brand {
+    color: #b3cde0;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    color: #ffffff;
+}
+
+.navbar-default .navbar-text {
+    color: #6497b1;
+}
+
+.nav-tabs > li {
+    color: #6497b1;
+}
+
+.nav-tabs > li > a:hover,
+.nav-tabs > li > a:focus {
+    color: #FFFFFF;
+    background-color: #6497b1;
+}
+
+.nav-tabs >li.active > a,
+.nav-tabs >li.active > a:hover,
+.nav-tabs >li.active > a:focus {
+    color: #FFFFFF;
+    background-color: #6497b1;
+}
+
+.navbar-default .nav-tabs > .open > a,
+.navbar-default .nav-tabs > .open > a:hover,
+.navbar-default .nav-tabs > .open > a:focus {
+    color: #ffffff;
+    background-color: #6497b1;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: #6497b1;
+}
+
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus {
+    background-color: #6497b1;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #b3cde0;
+}
+
+.navbar-default .navbar-collapse,
+.navbar-default .navbar-form {
+    border-color: #b3cde0;
+}
+
+.navbar-default .navbar-link {
+    color: #b3cde0;
+}
+
+.navbar-default .navbar-link:hover {
+    color: #ffffff;
+}
+
+@media (max-width: 767px) {
+    .navbar-default .nav-tabs .open .dropdown-menu > li > a {
+        color: #b3cde0;
+    }
+    .navbar-default .nav-tabs .open .dropdown-menu > li > a:hover,
+    .navbar-default .nav-tabs .open .dropdown-menu > li > a:focus {
+        color: #ffffff;
+    }
+    .navbar-default .nav-tabs .open .dropdown-menu > .active > a,
+    .navbar-default .nav-tabs .open .dropdown-menu > .active > a:hover,
+    .navbar-default .nav-tabs .open .dropdown-menu > .active > a:focus {
+        color: #ffffff;
+        background-color: #6497b1;
+    }
+}
+
+#portalCanvas {
+    left: 50%;
+    top: 10%;
+    transform: translate(-50%);
+    position: absolute;
+    cursor: pointer;
+}
+
 #container {
     position: relative;
 }
 
 #otherContainer {
+    height: 948px;
     z-index: 50;
     width: 100%;
     position: absolute;
@@ -79,6 +171,7 @@ a:active {
 #otherContainer.myHidden {
     opacity: 0;
     overflow: hidden;
+    height: 0;
 }
 
 #About {
@@ -103,6 +196,7 @@ a:active {
     width: 100%;
     text-align: center;
     padding-top: 5%;
+    color: #754d2e;
 }
 
 #myNavigation {
@@ -119,8 +213,9 @@ a:active {
 }
 
 .mySection {
-    height: 100vh;
+    height: 948px;
     width: 100%;
+    min-height: 948px;
 }
 
 #controlPanel {
@@ -130,9 +225,9 @@ a:active {
     width: 100%;
     color: #999;
     max-height: 600px;
-    -webkit-transition: max-height 0.2s;
-    -moz-transition: max-height 0.2s;
-    transition: max-height 0.2s;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
     overflow: hidden;
 }
 
@@ -163,10 +258,35 @@ a:active {
     z-index: 50;
     position: absolute;
     right: 0px;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
 }
 
 #visualControls.myHidden {
-    visibility: hidden
+    opacity: 0;
+}
+
+#returnButton {
+    z-index: 50;
+    position: absolute;
+    left: 1%;
+    font-size: 32px;
+    border: none;
+    background-color: #011f4b;
+    color: #754d2e;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
+}
+
+#returnButton.myHidden {
+    opacity: 0;
+}
+
+#returnButton:hover,
+#returnButton:active {
+    color: #fff;
 }
 
 .c {
@@ -208,5 +328,8 @@ a:active {
 @media (max-width: 480px) {
     #input {
         font-size: 16px;
+    }
+    .myTitle {
+        font-size: 80px;
     }
 }

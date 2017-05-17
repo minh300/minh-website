@@ -25,9 +25,9 @@
         visualFolder.add(visualizerParams, 'form', {
             Staff: 0,
             Heart: 1,
-            Spiral: 2,
-            Flower: 3,
-            Fountain: 4
+            //   Spiral: 2,
+            Flower: 2,
+            Fountain: 3
         }).onChange(function(value) {
             musicScene.transformVisual(value);
         }).listen();
@@ -70,8 +70,12 @@
     function onWindowResize(event) {
         var SCREEN_WIDTH = window.innerWidth;
         var SCREEN_HEIGHT = window.innerHeight;
-        var container = document.getElementById("container");
+        var otherContainer = $("#otherContainer");
+        console.log("before: " + otherContainer.css( "height" ))
 
+        otherContainer.height(SCREEN_HEIGHT-$("#myNavigation").height());
+        console.log("after: " + otherContainer.css( "height" ))
+        console.log(SCREEN_HEIGHT)
 
         renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         sceneManager.resizeWindows(SCREEN_WIDTH, SCREEN_HEIGHT);

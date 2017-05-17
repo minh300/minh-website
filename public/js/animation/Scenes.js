@@ -29,10 +29,10 @@ function MainScene(id, clearColor, controls, camera) {
     var objYaw = new THREE.Object3D();
     objYaw.position.set(0, 0, 0);
     this.scene.add(objYaw);
-    addObject(this, objYaw, -40, 22, 0, 1);
-    addObject(this, objYaw, 0, 22, -40, 2);
-    addObject(this, objYaw, 40, 22, 0, 3);
-    addObject(this, objYaw, 0, 22, 40, 4);
+    addObject(this, objYaw, -40, 22, 0, 1, 0x0000FF);
+    addObject(this, objYaw, 0, 22, -40, 2,  0xFF0000);
+    addObject(this, objYaw, 40, 22, 0, 3, 0xFFFF00);
+    addObject(this, objYaw, 0, 22, 40, 4, 0x000000);
 
     this.objYaw = objYaw;
 }
@@ -52,13 +52,14 @@ MainScene.prototype.updateObjects = function(delta) {
 
 
 //rename this
-function addObject(wrapper, objYaw, x, y, z, sceneID) {
+function addObject(wrapper, objYaw, x, y, z, sceneID, clearColor) {
     var geometry = new THREE.BoxGeometry(20, 20, 20);
     var textureCube = new THREE.CubeTextureLoader()
         .setPath('images/textures/cube/Park3Med/')
         .load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
     textureCube.mapping = THREE.CubeRefractionMapping;
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 });
+    var material = new THREE.MeshBasicMaterial({ color: clearColor,vertexColors: THREE.VertexColors, refractionRatio: 0.95 });
+  //  var material = new THREE.MeshBasicMaterial({ color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 });
 
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z)
@@ -158,7 +159,7 @@ function MusicScene(id, clearColor, controls, camera) {
     this.visuals = [];
     this.visuals.push(new Staff(innerRadius, 128, 10, .95, "staff"));
     this.visuals.push(new Heart(innerRadius, 128, 10, .95, "heart"));
-    this.visuals.push(new Spiral(innerRadius, 256, 10, .95, "spiral"));
+   // this.visuals.push(new Spiral(innerRadius, 256, 10, .95, "spiral"));
     this.visuals.push(new Flower(innerRadius, 128, 10, .95, "flower"));
     this.visuals.push(new Fountain(innerRadius, 128, 10, .95, "fountain"));
 
@@ -361,7 +362,7 @@ Scene.prototype.moveTo = function(x, y, z) {
     this.controls.moveTo(x, y, z);
 }
 Scene.prototype.enableControls = function(enable) {
-    this.controls.enabled = !this.controls.enabled;
+    this.controls.enabled = enable;
 }
 
 Scene.prototype.resizeWindow = function(width, height) {
@@ -382,7 +383,7 @@ Scene.prototype.render = function(delta, rtt) {
 };
 
 Scene.prototype.checkIntersection = function() {
-    if (!this.controls.pointerLockEnabled && !sceneManager.animateTransition) {
+    if (this.controls.enabled && !this.controls.pointerLockEnabled && !sceneManager.animateTransition) {
         var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 100);
 
         raycaster.setFromCamera(this.controls.mouse, this.camera);
@@ -397,8 +398,8 @@ Scene.prototype.checkIntersection = function() {
             }
             if (this.INTERSECTED.sceneID && this.controls.mouseDown) {
                 sceneManager.specialAnimate = true;
-                if(this.INTERSECTED.sceneID<3)
-                scrollTo(this.INTERSECTED.sceneID)
+                if (this.INTERSECTED.sceneID < 3)
+                    scrollTo(this.INTERSECTED.sceneID)
                 sceneManager.transitionTo(this.INTERSECTED.sceneID);
             }
         } else {

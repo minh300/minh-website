@@ -87,11 +87,11 @@ function SceneManager(scenes) {
     this.currentScene = 0;
     // Link both scenes and their FBOs
     var scenes = [];
-    scenes.push(new MainScene(0, 0xFFFFFF));
-    scenes.push(new MainScene(1, 0x0000FF));
-    scenes.push(new MainScene(2, 0xFF0000));
-    scenes.push(new MainScene(3, 0xFFFF00));
-    scenes.push(new MusicScene(4, 0x000000));
+    scenes.push(new MainScene(0, 0xb3cde0));
+    scenes.push(new MainScene(1, 0x6497b1));
+    scenes.push(new MainScene(2, 0x005b96));
+    scenes.push(new MainScene(3, 0x03396c));
+    scenes.push(new MusicScene(4, 0x011f4b));
 
     this.scenes = scenes;
     this.sceneA = scenes[this.currentScene];
@@ -208,7 +208,7 @@ SceneManager.prototype.transitionTo = function(sceneID) {
     var target = {
         x: 0
     };
-    this.tween = new TWEEN.Tween(position).to(target, 2000);
+    this.tween = new TWEEN.Tween(position).to(target, 1000);
 
     this.tween.onUpdate(function() {
         sceneManager.animateTransition = true;

@@ -42,6 +42,20 @@ var WorldController = function(scope, http, dataService) {
         var element = $('#' + element);
         element.toggleClass("myHidden");
     }
+    vm.hideWorld = function() {
+        var notWorld = $('.notWorld');
+        notWorld.removeClass('myHidden');
+        var returnButton = $('#returnButton');
+        returnButton.addClass('hidden');
+        sceneManager.enableControls(false);
+        sceneManager.specialAnimate = true;
+        var transitionTo = sceneManager.animateTransition ? sceneManager.sceneB.id : sceneManager.getCurrentScene().id;
+        if (transitionTo > 2) {
+            transitionTo = 0;
+            sceneManager.transitionTo(transitionTo);
+        }
+        scrollTo(transitionTo);
+    }
 
     var onKeyUp = function(event) {
         switch (event.keyCode) {
@@ -50,11 +64,9 @@ var WorldController = function(scope, http, dataService) {
                 break;
             case 81: //q
                 vm.toggleHide("visualControls");
-                vm.toggleHide("controlPanel");
                 break;
             case 90: //z
-                // vm.toggleHide("controlPanel");
-                showWorld();
+                vm.toggleHide("controlPanel");
                 break;
 
         }
