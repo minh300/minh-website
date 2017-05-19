@@ -6,7 +6,6 @@ app.directive("scroll", function() {
             var sections = ["#Home", "#About", "#Projects"];
             var onScroll = function() {
                 var sectionHeight = $('.mySection').height(); //needs to be here because of resizing
-                console.log(sectionHeight)
                 var newIndex = Math.floor((scrollContainer[0].scrollTop + sectionHeight / 4) / sectionHeight);
 
                 if (newIndex != vm.tabIndex) {

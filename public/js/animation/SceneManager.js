@@ -4,9 +4,7 @@ function SceneManager(scenes) {
 
     this.cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10);
 
-    this.textures = [];
-    for (var i = 0; i < 6; i++)
-        this.textures[i] = new THREE.TextureLoader().load('images/textures/transition/transition' + (i + 1) + '.png');
+    this.texture = new THREE.TextureLoader().load('images/textures/transition/transition1.png');
 
     this.quadmaterial = new THREE.ShaderMaterial({
 
@@ -28,7 +26,7 @@ function SceneManager(scenes) {
                 value: 1
             },
             tMixTexture: {
-                value: this.textures[0]
+                value: this.texture
             }
         },
         vertexShader: [
@@ -79,9 +77,9 @@ function SceneManager(scenes) {
 
     });
 
-    quadgeometry = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
+    this.quadgeometry = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
 
-    this.quad = new THREE.Mesh(quadgeometry, this.quadmaterial);
+    this.quad = new THREE.Mesh(this.quadgeometry, this.quadmaterial);
     this.scene.add(this.quad);
     this.animateTransition = false;
     this.currentScene = 0;
@@ -134,28 +132,12 @@ SceneManager.prototype.resizeWindows = function(width, height) {
     for (var i = 0; i < this.scenes.length; i++) {
         this.scenes[i].resizeWindow(width, height);
     }
+    this.cameraOrtho = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10, 10);
+    this.scene = new THREE.Scene();
+    this.quadgeometry = new THREE.PlaneBufferGeometry(width, height);
+    this.quad = new THREE.Mesh(this.quadgeometry, this.quadmaterial);
+    this.scene.add(this.quad);
 }
-
-
-SceneManager.prototype.setTextureThreshold = function(value) {
-
-    this.quadmaterial.uniforms.threshold.value = value;
-
-};
-
-
-SceneManager.prototype.useTexture = function(value) {
-
-    this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
-
-};
-
-SceneManager.prototype.setTexture = function(i) {
-
-    this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
-
-};
-
 
 SceneManager.prototype.setNewSceneB = function(id) {
     this.sceneB = this.scenes[id];

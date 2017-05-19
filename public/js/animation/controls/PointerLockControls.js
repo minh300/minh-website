@@ -208,7 +208,7 @@ THREE.PointerLockControls.prototype.update = function() {
     this.prevTime = time;
 }
 THREE.PointerLockControls.prototype.moveTo = function(x, y, z) {
-    this.moveForward=true;
+    this.moveForward = true;
 };
 
 function bind(scope, fn) {

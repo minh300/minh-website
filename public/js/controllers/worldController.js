@@ -1,10 +1,18 @@
 'use strict';
 
-var updateDataService = function(key, value) {
+//should move these two to an object
+function updateDataService(key, value) {
     var elem = angular.element(document.querySelector('[ng-controller="WorldController as vm"]'));
     var injector = elem.injector();
     var myService = injector.get('dataService');
     myService.update(key, value);
+}
+
+function openInfo() {
+    var elem = angular.element(document.querySelector('[ng-controller="WorldController as vm"]'));
+    var injector = elem.injector();
+    var myService = injector.get('dataService');
+    myService.openInfo();
 }
 
 
@@ -19,12 +27,6 @@ var WorldController = function(scope, http, dataService) {
     }, function(response) {
         vm.data = response.data || 'Request failed';
     });
-
-
-
-    vm.isMusicScene = function() {
-        return this.dataService.currentScene == 1;
-    }
 
     vm.play = function() {
         var currentSelection = this.dataService.currentSong;
@@ -47,8 +49,11 @@ var WorldController = function(scope, http, dataService) {
         notWorld.removeClass('myHidden');
         var returnButton = $('#returnButton');
         returnButton.addClass('hidden');
+        //this is needed since height isnt set when its hidden
+        var otherContainer = $("#otherContainer");
+        otherContainer.height(window.innerHeight - 42); //42 is constant size of navigation panel
         sceneManager.enableControls(false);
-        sceneManager.specialAnimate = true;
+        sceneManager.specialAnimate = true; //scrolls to apprioate section without activating scrolling transition
         var transitionTo = sceneManager.animateTransition ? sceneManager.sceneB.id : sceneManager.getCurrentScene().id;
         if (transitionTo > 2) {
             transitionTo = 0;
@@ -59,9 +64,6 @@ var WorldController = function(scope, http, dataService) {
 
     var onKeyUp = function(event) {
         switch (event.keyCode) {
-            case 27: //ESC
-                parentVm.open();
-                break;
             case 81: //q
                 vm.toggleHide("visualControls");
                 break;

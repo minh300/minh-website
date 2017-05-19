@@ -30,7 +30,7 @@ function MainScene(id, clearColor, controls, camera) {
     objYaw.position.set(0, 0, 0);
     this.scene.add(objYaw);
     addObject(this, objYaw, -40, 22, 0, 1, 0x0000FF);
-    addObject(this, objYaw, 0, 22, -40, 2,  0xFF0000);
+    addObject(this, objYaw, 0, 22, -40, 2, 0xFF0000);
     addObject(this, objYaw, 40, 22, 0, 3, 0xFFFF00);
     addObject(this, objYaw, 0, 22, 40, 4, 0x000000);
 
@@ -54,12 +54,12 @@ MainScene.prototype.updateObjects = function(delta) {
 //rename this
 function addObject(wrapper, objYaw, x, y, z, sceneID, clearColor) {
     var geometry = new THREE.BoxGeometry(20, 20, 20);
-    var textureCube = new THREE.CubeTextureLoader()
-        .setPath('images/textures/cube/Park3Med/')
-        .load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
-    textureCube.mapping = THREE.CubeRefractionMapping;
-    var material = new THREE.MeshBasicMaterial({ color: clearColor,vertexColors: THREE.VertexColors, refractionRatio: 0.95 });
-  //  var material = new THREE.MeshBasicMaterial({ color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 });
+    /*   var textureCube = new THREE.CubeTextureLoader()
+           .setPath('images/textures/cube/Park3Med/')
+           .load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+       textureCube.mapping = THREE.CubeRefractionMapping;*/
+    var material = new THREE.MeshBasicMaterial({ color: clearColor, vertexColors: THREE.VertexColors, refractionRatio: 0.95 });
+    //  var material = new THREE.MeshBasicMaterial({ color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 });
 
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z)
@@ -159,7 +159,7 @@ function MusicScene(id, clearColor, controls, camera) {
     this.visuals = [];
     this.visuals.push(new Staff(innerRadius, 128, 10, .95, "staff"));
     this.visuals.push(new Heart(innerRadius, 128, 10, .95, "heart"));
-   // this.visuals.push(new Spiral(innerRadius, 256, 10, .95, "spiral"));
+    // this.visuals.push(new Spiral(innerRadius, 256, 10, .95, "spiral"));
     this.visuals.push(new Flower(innerRadius, 128, 10, .95, "flower"));
     this.visuals.push(new Fountain(innerRadius, 128, 10, .95, "fountain"));
 
@@ -207,6 +207,9 @@ MusicScene.prototype.onKeyDown = function(event) {
 
 MusicScene.prototype.onKeyUp = function(event) {
     switch (event.keyCode) {
+        case 27: //ESC
+            openInfo();
+            break;
         case 71: //g
             this.transformVisual();
             break;
@@ -353,8 +356,7 @@ function Scene(id, clearColor) {
     this.scene.add(this.controls.yawObject);
 
     this.objects = [];
-    var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-    this.fbo = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, renderTargetParameters);
+    this.fbo = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false });
 }
 
 

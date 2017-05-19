@@ -58,7 +58,6 @@
             antialias: true
         });
         renderer.setPixelRatio(window.devicePixelRatio);
-        //renderer.setSize($(container).width(), $(container).height());
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.sortObjects = false;
         container.appendChild(renderer.domElement);
@@ -71,12 +70,7 @@
         var SCREEN_WIDTH = window.innerWidth;
         var SCREEN_HEIGHT = window.innerHeight;
         var otherContainer = $("#otherContainer");
-        console.log("before: " + otherContainer.css( "height" ))
-
-        otherContainer.height(SCREEN_HEIGHT-$("#myNavigation").height());
-        console.log("after: " + otherContainer.css( "height" ))
-        console.log(SCREEN_HEIGHT)
-
+        otherContainer.height(SCREEN_HEIGHT - 42); //42 is constant size of navigation panel
         renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         sceneManager.resizeWindows(SCREEN_WIDTH, SCREEN_HEIGHT);
     }

@@ -2,25 +2,24 @@
 <html lang="en">
 
 <head>
-    <title>3D Music Visualizer</title>
+    <title>World Visualizer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/animate.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css" rel="stylesheet">
-    <script src="../js/lib/jquery-3.2.1.min.js"></script>
-    <script src="../js/lib/angular.min.js"></script>
-    <script src="../js/lib/angular-animate.min.js"></script>
-    <script src="../js/lib/ui-bootstrap-tpls-2.5.0.min.js"></script>
-    <script src="../js/lib/three.min.js"></script>
-    <script src="../js/lib/Tween.min.js"></script>
-    <script src="../js/lib/dat.gui.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.6.0/Tween.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/controllers/mainController.js"></script>
     <script src="../js/controllers/worldController.js"></script>
     <script src="../js/directives/scroll.js"></script>
     <script src="../js/directives/scrollTo.js"></script>
     <script src="../js/directives/portal.js"></script>
+    <script src="../js/services/DataService.js"></script>
     <script src="../js/audio/AudioManager.js"></script>
     <script src="../js/animation/ParticleSystem.js"></script>
     <script src="../js/animation/Scenes.js"></script>
@@ -41,13 +40,13 @@
         </div>
         <div id="otherContainer" scroll class="notWorld">
             <div id="Home" class="mySection">
-                <canvas portal id="portalCanvas" width="65" height="65" ng-click="vm.showWorld()"></canvas>
+                <canvas portal id="portalCanvas" width="65" height="65"></canvas>
             </div>
             <div id="About" class="mySection">
                 <div class="myTitle">About section..</div>
             </div>
             <div id="Projects" class="mySection">
-                 <div class="myTitle">Projects section..</div>
+                <div class="myTitle">Projects section..</div>
             </div>
         </div>
         <div id="container" ng-controller="WorldController as vm">
