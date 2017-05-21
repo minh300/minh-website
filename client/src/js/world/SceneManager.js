@@ -1,4 +1,4 @@
-function SceneManager(scenes) {
+function SceneManager(container) {
 
     this.scene = new THREE.Scene();
 
@@ -85,17 +85,26 @@ function SceneManager(scenes) {
     this.currentScene = 0;
     // Link both scenes and their FBOs
     var scenes = [];
-    scenes.push(new MainScene(0, 0xb3cde0));
-    scenes.push(new MainScene(1, 0x6497b1));
-    scenes.push(new MainScene(2, 0x005b96));
-    scenes.push(new MainScene(3, 0x03396c));
-    //scenes.push(new MusicScene(4, 0x000000));
-    scenes.push(new MusicScene(4, 0x011f4b));
+    scenes.push(new SCENES.MainScene(this, 0, 0xb3cde0));
+    scenes.push(new SCENES.MainScene(this, 1, 0x6497b1));
+    scenes.push(new SCENES.MainScene(this, 2, 0x005b96));
+    // scenes.push(new MainScene(this, 3, 0x03396c));
+    scenes.push(new SCENES.MusicScene(this, 3, 0x011f4b));
 
     this.scenes = scenes;
     this.sceneA = scenes[this.currentScene];
 
     this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
+
+
+    this.renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.sortObjects = false;
+    container.appendChild(this.renderer.domElement);
+
 }
 
 SceneManager.prototype.moveTo = function(x, y, z) {
@@ -129,6 +138,8 @@ SceneManager.prototype.getCurrentScene = function() {
 
 
 SceneManager.prototype.resizeWindows = function(width, height) {
+    this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
     for (var i = 0; i < this.scenes.length; i++) {
         this.scenes[i].resizeWindow(width, height);
     }
@@ -157,13 +168,13 @@ SceneManager.prototype.render = function(delta) {
     this.quadmaterial.uniforms.mixRatio.value = this.transition;
 
     if (!this.animateTransition) {
-        this.scenes[this.currentScene].render(delta, false);
+        this.scenes[this.currentScene].render(this.renderer, delta, false);
         this.animateTransition = false;
     } else {
         // When 0<transition<1 render transition between two scenes
-        this.sceneA.render(delta, true);
-        this.sceneB.render(delta, true);
-        renderer.render(this.scene, this.cameraOrtho, null, true);
+        this.sceneA.render(this.renderer, delta, true);
+        this.sceneB.render(this.renderer, delta, true);
+        this.renderer.render(this.scene, this.cameraOrtho, null, true);
     }
 }
 

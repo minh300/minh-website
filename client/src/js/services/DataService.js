@@ -19,3 +19,18 @@ angular.module('app').factory('dataService', ['$rootScope','$uibModal', function
 
     return dataService;
 }]);
+
+//should move these two to an object
+function updateDataService(key, value) {
+    var elem = angular.element(document.querySelector('[ng-controller="MainController as vm"]'));
+    var injector = elem.injector();
+    var myService = injector.get('dataService');
+    myService.update(key, value);
+}
+
+function openInfo() {
+    var elem = angular.element(document.querySelector('[ng-controller="MainController as vm"]'));
+    var injector = elem.injector();
+    var myService = injector.get('dataService');
+    myService.openInfo();
+}

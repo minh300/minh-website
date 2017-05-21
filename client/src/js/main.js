@@ -45,8 +45,7 @@ $(document).ready(function() {
     });
 
     //world
-    init();
-    animate();
+    initWorld();
 
     //lets you animate and after its done, cleans it up, look at animate.css
     $.fn.extend({
@@ -59,24 +58,6 @@ $(document).ready(function() {
     });
 });
 
-
-
-
-
-//should move these two to an object
-function updateDataService(key, value) {
-    var elem = angular.element(document.querySelector('[ng-controller="MainController as vm"]'));
-    var injector = elem.injector();
-    var myService = injector.get('dataService');
-    myService.update(key, value);
-}
-
-function openInfo() {
-    var elem = angular.element(document.querySelector('[ng-controller="MainController as vm"]'));
-    var injector = elem.injector();
-    var myService = injector.get('dataService');
-    myService.openInfo();
-}
 
 function toggleForId(id, className) {
     var element = $('#' + id);

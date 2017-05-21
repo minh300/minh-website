@@ -43,8 +43,8 @@ angular.module('directives.portal', []).directive("portal", function() {
     }
 
     function showWorld() {
-        var notWorld = $('.notWorld');
-        notWorld.addClass('myHidden');
+        var foreGround = $('.foreGround');
+        foreGround.addClass('myHidden');
         var returnButton = $('#returnButton');
         returnButton.removeClass('hidden');
         sceneManager.enableControls(true);

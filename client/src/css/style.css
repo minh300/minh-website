@@ -153,11 +153,11 @@ a:active {
     cursor: pointer;
 }
 
-#container {
+#bgContainer {
     position: relative;
 }
 
-#otherContainer {
+#fgContainer {
     height: 948px;
     z-index: 50;
     width: 100%;
@@ -168,7 +168,7 @@ a:active {
     transition: 1s;
 }
 
-#otherContainer.myHidden {
+#fgContainer.myHidden {
     opacity: 0;
     overflow: hidden;
     height: 0;
@@ -178,16 +178,10 @@ a:active {
     background-color: rgba(255, 255, 255, 0);
 }
 
-#Home {}
+#Home {} 
 
 #Projects {
     background-color: rgba(0, 255, 255, 0);
-}
-
-#portal {
-    -webkit-transition: 0.2s;
-    -moz-transition: 0.2s;
-    transition: 0.2s;
 }
 
 .myTitle {
@@ -218,6 +212,57 @@ a:active {
     min-height: 948px;
 }
 
+
+
+
+/*related to world*/
+
+/*        navigation                                 */
+#returnButton {
+    z-index: 50;
+    position: absolute;
+    left: 1%;
+    font-size: 32px;
+    border: none;
+    background-color: #011f4b;
+    color: #754d2e;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
+}
+
+#returnButton.myHidden {
+    opacity: 0;
+}
+
+#returnButton:hover,
+#returnButton:active {
+    color: #fff;
+}
+/*        end navigation                             */
+
+
+/*         visual control panel                      */
+.c {
+    color: black;
+}
+
+#visualControls {
+    z-index: 50;
+    position: absolute;
+    right: 0px;
+    -webkit-transition: 1s;
+    -moz-transition: 1s;
+    transition: 1s;
+}
+
+#visualControls.myHidden {
+    opacity: 0;
+}
+/*         end visual control panel                  */
+
+
+/*         control panel for music player            */
 #controlPanel {
     z-index: 50;
     position: absolute;
@@ -254,45 +299,6 @@ a:active {
     padding-top: 10px;
 }
 
-#visualControls {
-    z-index: 50;
-    position: absolute;
-    right: 0px;
-    -webkit-transition: 1s;
-    -moz-transition: 1s;
-    transition: 1s;
-}
-
-#visualControls.myHidden {
-    opacity: 0;
-}
-
-#returnButton {
-    z-index: 50;
-    position: absolute;
-    left: 1%;
-    font-size: 32px;
-    border: none;
-    background-color: #011f4b;
-    color: #754d2e;
-    -webkit-transition: 1s;
-    -moz-transition: 1s;
-    transition: 1s;
-}
-
-#returnButton.myHidden {
-    opacity: 0;
-}
-
-#returnButton:hover,
-#returnButton:active {
-    color: #fff;
-}
-
-.c {
-    color: black;
-}
-
 #input {
     font-size: 20px;
     padding: 8px;
@@ -321,6 +327,10 @@ a:active {
 #player {
     width: 95%;
 }
+/*     end control panel for music player             */
+
+
+
 
 
 /* make some txt small for small screens */
