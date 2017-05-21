@@ -138,7 +138,7 @@ SceneManager.prototype.getCurrentScene = function() {
 
 
 SceneManager.prototype.resizeWindows = function(width, height) {
-    this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    this.renderer.setSize(width, height);
 
     for (var i = 0; i < this.scenes.length; i++) {
         this.scenes[i].resizeWindow(width, height);
@@ -180,10 +180,6 @@ SceneManager.prototype.render = function(delta) {
 
 
 SceneManager.prototype.transitionTo = function(sceneID) {
-    if (this.animateTransition && this.specialAnimate) {
-        return;
-    }
-
     if (this.tween) {
         this.tween.stop();
     }

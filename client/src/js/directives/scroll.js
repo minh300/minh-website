@@ -9,6 +9,7 @@ angular.module('directives.scroll', []).directive("scroll", function() {
 
                 if (newIndex != vm.tabIndex) {
                     vm.tabIndex = newIndex;
+                    if(!sceneManager.specialAnimate)
                     sceneManager.transitionTo(newIndex);
                     $scope.$apply();
                 }

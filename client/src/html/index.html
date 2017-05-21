@@ -19,9 +19,9 @@
 <body ng-app="app" ng-controller="MainController as vm">
     <div id="myNavigation" class="foreGround">
         <ul class="nav navbar-default nav-tabs">
-            <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
-            <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
-            <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
+            <li scroll-to index="0" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
+            <li scroll-to index="1" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
+            <li scroll-to index="2" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
         </ul>
     </div>
     <div id="fgContainer" scroll class="foreGround">

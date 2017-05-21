@@ -405,7 +405,6 @@ var SCENES = (function() {
                 }
                 if (this.INTERSECTED.sceneID && this.controls.mouseDown) {
                     this.sceneManager.transitionTo(this.INTERSECTED.sceneID);
-                    //might want to add scrollto back in here
                 }
             } else {
                 if (this.INTERSECTED) {
