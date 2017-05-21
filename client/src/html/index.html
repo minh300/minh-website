@@ -28,7 +28,7 @@
         </div>
         <div id="otherContainer" scroll class="notWorld">
             <div id="Home" class="mySection">
-                <canvas portal id="portalCanvas" width="65" height="65"></canvas>
+                <canvas id="portalCanvas" portal  width="65" height="65" ng-click="vm.loadMuslicList()"></canvas>
             </div>
             <div id="About" class="mySection">
                 <div class="myTitle">About section..</div>
@@ -41,7 +41,7 @@
             <button return-portal id="returnButton" class="hidden glyphicon glyphicon-menu-down"></button>
             <div id="visualControls" class="hidden"> </div>
             <div id="controlPanel" class="hidden">
-                <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
+                <div id="tab" ctrl-panel-tab><a href="#"><i class="icon-menu"></i></a></div>
                 <div id="playerControls">
                     <select id="input" ng-model="vm.dataService.currentSong" ng-options="item for item in vm.musicList"></select>
                     <button id="submit" ng-click="vm.play()"> <i class="icon-play"></i></button>

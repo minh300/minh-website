@@ -96,7 +96,6 @@ function SceneManager(scenes) {
     this.sceneA = scenes[this.currentScene];
 
     this.quadmaterial.uniforms.tDiffuse1.value = this.sceneA.fbo.texture;
-    this.transitionBuffer = -1;
 }
 
 SceneManager.prototype.moveTo = function(x, y, z) {
@@ -171,15 +170,13 @@ SceneManager.prototype.render = function(delta) {
 
 SceneManager.prototype.transitionTo = function(sceneID) {
     if (this.animateTransition && this.specialAnimate) {
-        // this.transitionBuffer = sceneID;
         return;
     }
 
     if (this.tween) {
         this.tween.stop();
     }
-    var sceneManager = this;
-    sceneManager.setNewSceneB(sceneID);
+    this.setNewSceneB(sceneID);
     if (this.scenes[sceneID].name !== "MusicScene") {
         $('#visualControls').addClass("hidden");
         $('#controlPanel').addClass("hidden");
@@ -193,6 +190,8 @@ SceneManager.prototype.transitionTo = function(sceneID) {
     };
     this.tween = new TWEEN.Tween(position).to(target, 1000);
 
+    var sceneManager = this;
+
     this.tween.onUpdate(function() {
         sceneManager.animateTransition = true;
         sceneManager.transition = position.x;
@@ -204,15 +203,7 @@ SceneManager.prototype.transitionTo = function(sceneID) {
             $('#controlPanel').removeClass("hidden");
         }
         sceneManager.specialAnimate = false;
-        // sceneManager.checkTransitionBuffer();
     });
     this.tween.start();
 
-}
-
-SceneManager.prototype.checkTransitionBuffer = function() {
-    if (this.transitionBuffer !== -1) {
-        this.transitionTo(this.transitionBuffer);
-        this.transitionBuffer = -1;
-    }
 }

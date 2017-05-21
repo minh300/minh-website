@@ -1,4 +1,4 @@
-angular.module('app', ['ui.bootstrap', 'directives.portal', 'directives.returnPortal', 'directives.scroll', 'directives.scrollTo', 'templates.app', ]);
+angular.module('app', ['ui.bootstrap', 'directives.portal', 'directives.returnPortal', 'directives.scroll', 'directives.scrollTo', 'directives.ctrlPanelTab', 'templates.app', ]);
 
 angular.module('app').config(['$compileProvider', function($compileProvider) {
     $compileProvider.debugInfoEnabled(false);
@@ -9,12 +9,14 @@ var mainController = function(http, dataService) {
 
     vm.dataService = dataService;
 
-    http({ method: 'GET', url: "../musicList" }).
-    then(function(response) {
-        vm.musicList = response.data;
-    }, function(response) {
-        vm.data = response.data || 'Request failed';
-    });
+    vm.loadMuslicList = function() {
+        http({ method: 'GET', url: "../musicList" }).
+        then(function(response) {
+            vm.musicList = response.data;
+        }, function(response) {
+            console.log("Unable to get music list");
+        });
+    };
 
     vm.play = function() {
         var currentSelection = this.dataService.currentSong;
@@ -26,29 +28,9 @@ var mainController = function(http, dataService) {
                 audioManager.playSound('music/' + currentSelection, undefined, [bind(scene.particleSystem, scene.particleSystem.onCompleteParticleSystem), bind(scene, scene.onMusicLoaded)]);
             }
         }
-    }
-
-    vm.toggleHide = function(element) {
-        toggleForId(element, "myHidden");
-    }
-
-    var onKeyUp = function(event) {
-        switch (event.keyCode) {
-            case 81: //q
-                toggleForId("visualControls", "myHidden");
-                break;
-            case 90: //z
-                toggleForId("controlPanel", "myHidden");
-                break;
-
-        }
-
     };
 
-    $(document).on('keyup', onKeyUp);
     vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
-
-
 };
 
 mainController['$inject'] = ['$http', 'dataService'];
@@ -65,18 +47,20 @@ $(document).ready(function() {
     //world
     init();
     animate();
+
+    //lets you animate and after its done, cleans it up, look at animate.css
+    $.fn.extend({
+        animateCss: function(animationName) {
+            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+            this.addClass('animated ' + animationName).one(animationEnd, function() {
+                $(this).removeClass('animated ' + animationName);
+            });
+        }
+    });
 });
 
 
-//lets you animate and turn clenas it up, look at animate.css
-$.fn.extend({
-    animateCss: function(animationName) {
-        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-        this.addClass('animated ' + animationName).one(animationEnd, function() {
-            $(this).removeClass('animated ' + animationName);
-        });
-    }
-});
+
 
 
 //should move these two to an object

@@ -185,10 +185,16 @@ function MusicScene(id, clearColor, controls, camera) {
     var _onKeyDown = bind(this, this.onKeyDown);
     var _onKeyUp = bind(this, this.onKeyUp);
 
-
-    $(document).on('keyup', _onKeyUp);
-    $(document).on('keydown', _onKeyDown);
-
+    this.enableControls = function(enable) {
+        this.controls.enableControls(enable);
+        if (enable) {
+            $(document).on('keyup', _onKeyUp);
+            $(document).on('keydown', _onKeyDown);
+        } else {
+            $(document).off('keyup', _onKeyUp);
+            $(document).off('keydown', _onKeyDown);
+        }
+    }
 }
 
 MusicScene.prototype = Object.create(Scene.prototype);
@@ -210,17 +216,23 @@ MusicScene.prototype.onKeyUp = function(event) {
         case 27: //ESC
             openInfo();
             break;
+        case 49: //1
+            this.decreaseDecay = false;
+            break;
+        case 50: //2
+            this.increaseDecay = false;
+            break;
         case 71: //g
             this.transformVisual();
             break;
         case 66: //b
             this.visualizerParams.pulse = !this.visualizerParams.pulse;
             break;
-        case 49: //1
-            this.decreaseDecay = false;
+        case 81: //q
+            toggleForId("visualControls", "myHidden");
             break;
-        case 50: //2
-            this.increaseDecay = false;
+        case 90: //z
+            toggleForId("controlPanel", "myHidden");
             break;
     }
 
@@ -341,7 +353,6 @@ MusicScene.prototype.updateDecay = function(delta) {
 
 
 
-
 function Scene(id, clearColor) {
     this.id = id;
     this.clearColor = clearColor;
@@ -400,7 +411,6 @@ Scene.prototype.checkIntersection = function() {
                 this.INTERSECTED.onHover();
             }
             if (this.INTERSECTED.sceneID && this.controls.mouseDown) {
-                sceneManager.specialAnimate = true;
                 sceneManager.transitionTo(this.INTERSECTED.sceneID);
             }
         } else {
