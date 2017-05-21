@@ -176,7 +176,7 @@ function MusicScene(id, clearColor, controls, camera) {
         "pulse": false,
         "current": 0,
         "form": 0,
-        "forms": 5,
+        "forms": 4,
         "opacity": 0,
         "randomize": true,
         "randomizeIntervals": 30

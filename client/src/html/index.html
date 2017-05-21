@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>World Visualizer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="<%= grunt.config.get('pkg.name') %>.css" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.6.0/Tween.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
+    <script type="text/javascript" src="<%= grunt.config.get('pkg.name') %>.js"></script>
+
+</head>
+
+<body ng-app="app" ng-controller="MainController as vm">
+    <div id="portal">
+        <div id="myNavigation" class="notWorld">
+            <ul class="nav navbar-default nav-tabs">
+                <li scroll-to heading="Home" ng-class="{'active':vm.tabIndex==0}"><a href="#">Home</a></li>
+                <li scroll-to heading="About" ng-class="{'active':vm.tabIndex==1}"><a href="#">About</a></li>
+                <li scroll-to heading="Projects" ng-class="{'active':vm.tabIndex==2}"><a href="#">Projects</a></li>
+            </ul>
+        </div>
+        <div id="otherContainer" scroll class="notWorld">
+            <div id="Home" class="mySection">
+                <canvas portal id="portalCanvas" width="65" height="65"></canvas>
+            </div>
+            <div id="About" class="mySection">
+                <div class="myTitle">About section..</div>
+            </div>
+            <div id="Projects" class="mySection">
+                <div class="myTitle">Projects section..</div>
+            </div>
+        </div>
+        <div id="container">
+            <button return-portal id="returnButton" class="hidden glyphicon glyphicon-menu-down"></button>
+            <div id="visualControls" class="hidden"> </div>
+            <div id="controlPanel" class="hidden">
+                <div id="tab"><a href="#" ng-click="vm.toggleHide('controlPanel')"><i class="icon-menu"></i></a></div>
+                <div id="playerControls">
+                    <select id="input" ng-model="vm.dataService.currentSong" ng-options="item for item in vm.musicList"></select>
+                    <button id="submit" ng-click="vm.play()"> <i class="icon-play"></i></button>
+                    <audio id="player" controls="" preload="" autobuffer="" crossorigin="anonymous"></audio>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
