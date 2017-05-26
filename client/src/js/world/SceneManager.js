@@ -80,13 +80,14 @@ function SceneManager(container) {
     this.quadgeometry = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
 
     this.quad = new THREE.Mesh(this.quadgeometry, this.quadmaterial);
+    this.quad.name = "quad";
     this.scene.add(this.quad);
     this.animateTransition = false;
     this.currentScene = 0;
     // Link both scenes and their FBOs
     var scenes = [];
     scenes.push(new SCENES.MainScene(this, 0, 0xb3cde0));
-    scenes.push(new SCENES.MainScene(this, 1, 0x6497b1));
+    scenes.push(new SCENES.RoomScene(this, 1, 0x6497b1));//hsl(200, 33%, 54%)
     scenes.push(new SCENES.MainScene(this, 2, 0x005b96));
     // scenes.push(new MainScene(this, 3, 0x03396c));
     scenes.push(new SCENES.MusicScene(this, 3, 0x011f4b));
@@ -139,13 +140,12 @@ SceneManager.prototype.getCurrentScene = function() {
 
 SceneManager.prototype.resizeWindows = function(width, height) {
     this.renderer.setSize(width, height);
-
     for (var i = 0; i < this.scenes.length; i++) {
         this.scenes[i].resizeWindow(width, height);
     }
     this.cameraOrtho = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10, 10);
-    this.scene = new THREE.Scene();
     this.quadgeometry = new THREE.PlaneBufferGeometry(width, height);
+    this.scene.remove(this.quad);
     this.quad = new THREE.Mesh(this.quadgeometry, this.quadmaterial);
     this.scene.add(this.quad);
 }

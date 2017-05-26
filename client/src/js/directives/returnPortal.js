@@ -1,8 +1,9 @@
 angular.module('directives.returnPortal', []).directive("returnPortal", function() {
+    var foreGround = $('.foreGround');
+    var fgContainer = $('#fgContainer');
     return {
         link: function($scope, element, attrs) {
-            var foreGround = $('.foreGround');
-            var fgContainer = $('#fgContainer');
+
 
             function hideWorld() {
                 foreGround.removeClass('myHidden');
@@ -15,7 +16,7 @@ angular.module('directives.returnPortal', []).directive("returnPortal", function
                     transitionTo = 0;
                 }
 
-                scrollToIndex(fgContainer, transitionTo)();
+                scrollToIndex(transitionTo)();
             }
             element.on("click", hideWorld);
 

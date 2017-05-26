@@ -9,6 +9,8 @@ var mainController = function(http, dataService) {
 
     vm.dataService = dataService;
 
+    vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
+    
     vm.loadMuslicList = function() {
         http({ method: 'GET', url: "../musicList" }).
         then(function(response) {
@@ -30,7 +32,7 @@ var mainController = function(http, dataService) {
         }
     };
 
-    vm.tabIndex = Math.floor(window.pageYOffset / $('.mySection').height());
+
 };
 
 mainController['$inject'] = ['$http', 'dataService'];

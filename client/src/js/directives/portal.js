@@ -1,6 +1,8 @@
 angular.module('directives.portal', []).directive("portal", function() {
     var ctx, cw, ch, centerX, centerY, radius = 10;
-    var position = {r: 1}, startPosition={r:1},endPosition={r:3};
+    var position = { r: 1 },
+        startPosition = { r: 1 },
+        endPosition = { r: 3 };
     var startTween = new TWEEN.Tween(position).to(endPosition, 1000).onUpdate(function() {
         draw(position.r);
     }).repeat(Infinity).yoyo(true);
@@ -19,14 +21,6 @@ angular.module('directives.portal', []).directive("portal", function() {
         draw(1);
     }
 
-    function drawCirc(multipler) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius * multipler, 0, 2 * Math.PI, false);
-        ctx.lineWidth = 4;
-        ctx.stroke();
-    }
-
     function animate() {
         stopTween.stop();
         startTween.start();
@@ -37,14 +31,19 @@ angular.module('directives.portal', []).directive("portal", function() {
         stopTween.start();
     }
 
-    function draw(r) {
+    function draw(multipler) {
         ctx.clearRect(0, 0, cw, ch);
-        drawCirc(r);
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * multipler, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 4;
+        ctx.stroke();
     }
 
     function showWorld() {
         var foreGround = $('.foreGround');
         foreGround.addClass('myHidden');
+        foreGround.removeAttr("style"); //resets any style set
         var returnButton = $('#returnButton');
         returnButton.removeClass('hidden');
         sceneManager.enableControls(true);

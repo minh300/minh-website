@@ -7,7 +7,6 @@ THREE.PointerLockControls = function(camera) {
     this.id = Math.random();
 
     this.mouse = new THREE.Vector2();
-    this.mouseDown = false;
     this.moveForward = false;
     this.moveBackward = false;
     this.moveLeft = false;
@@ -52,8 +51,6 @@ THREE.PointerLockControls = function(camera) {
 
     var _onKeyDown = bind(this, this.onKeyDown);
     var _onKeyUp = bind(this, this.onKeyUp);
-    var _onMouseDown = bind(this, this.onMouseDown);
-    var _onMouseUp = bind(this, this.onMouseUp);
     var _onMouseMove = bind(this, this.onMouseMove);
     var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
     var _pointerlockchange = bind(this, this.pointerlockchange);
@@ -63,8 +60,6 @@ THREE.PointerLockControls = function(camera) {
         if (enabled) {
             $(document).on('keydown', _onKeyDown);
             $(document).on('keyup', _onKeyUp);
-            $(document).on('mousedown touchstart', _onMouseDown);
-            $(document).on('mouseup', _onMouseUp);
             $(document).on('mousemove', _onMouseMove);
 
             if (havePointerLock) {
@@ -77,8 +72,6 @@ THREE.PointerLockControls = function(camera) {
         } else {
             $(document).off('keydown', _onKeyDown);
             $(document).off('keyup', _onKeyUp);
-            $(document).off('mousedown touchstart', _onMouseDown);
-            $(document).off('mouseup', _onMouseUp);
             $(document).off('mousemove', _onMouseMove);
 
             if (havePointerLock) {
@@ -184,14 +177,6 @@ THREE.PointerLockControls.prototype.onKeyUp = function(event) {
             sceneManager.transitionTo(sceneManager.currentScene == 0 ? 4 : 0);
             break;
     }
-};
-
-THREE.PointerLockControls.prototype.onMouseDown = function(event) {
-    this.mouseDown = true;
-};
-
-THREE.PointerLockControls.prototype.onMouseUp = function(event) {
-    this.mouseDown = false;
 };
 
 THREE.PointerLockControls.prototype.update = function() {

@@ -1,13 +1,19 @@
 angular.module('directives.scrollTo', []).directive("scrollTo", function() {
     return {
         link: function($scope, element, attrs) {
-            var fgContainer = $('#fgContainer');
-            element.on("click", scrollToIndex(fgContainer, attrs.index));
+            var onClick = scrollToIndex(attrs.index);
+            element.on("click", onClick);
+
+            $scope.$on('$destroy', function() {
+                element.off('click', onClick);
+            });
         }
     };
 });
 
-function scrollToIndex(container, index) {
+function scrollToIndex( index) {
+    var fgContainer = $('#fgContainer');
+
     var sections = ["#Home", "#About", "#Projects"];
 
     var scrollTo = $(sections[index])[0];
@@ -16,7 +22,7 @@ function scrollToIndex(container, index) {
         sceneManager.specialAnimate = true; //scrolls to apprioate section without activating scrolling transition
         sceneManager.transitionTo(index);
 
-        container.animate({
+        fgContainer.animate({
             scrollTop: scrollTo.offsetTop
         }, 750);
     }

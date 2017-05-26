@@ -145,6 +145,10 @@ a:active {
     }
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 #portalCanvas {
     left: 50%;
     top: 10%;
@@ -178,7 +182,7 @@ a:active {
     background-color: rgba(255, 255, 255, 0);
 }
 
-#Home {} 
+#Home {}
 
 #Projects {
     background-color: rgba(0, 255, 255, 0);
@@ -213,11 +217,11 @@ a:active {
 }
 
 
-
-
 /*related to world*/
 
+
 /*        navigation                                 */
+
 #returnButton {
     z-index: 50;
     position: absolute;
@@ -239,10 +243,13 @@ a:active {
 #returnButton:active {
     color: #fff;
 }
+
+
 /*        end navigation                             */
 
 
 /*         visual control panel                      */
+
 .c {
     color: black;
 }
@@ -259,10 +266,13 @@ a:active {
 #visualControls.myHidden {
     opacity: 0;
 }
+
+
 /*         end visual control panel                  */
 
 
 /*         control panel for music player            */
+
 #controlPanel {
     z-index: 50;
     position: absolute;
@@ -327,10 +337,9 @@ a:active {
 #player {
     width: 95%;
 }
+
+
 /*     end control panel for music player             */
-
-
-
 
 
 /* make some txt small for small screens */
