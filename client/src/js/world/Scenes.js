@@ -117,6 +117,7 @@ var SCENES = (function() {
         mesh.onClick = function() {
             wrapper.sceneManager.transitionTo(mesh.sceneID);
         }
+        mesh._onClick = bind(mesh, mesh.onClick);
 
         objYaw.add(mesh);
         wrapper.objects.push(mesh);
@@ -139,44 +140,113 @@ var SCENES = (function() {
 
 
     //array of named 3d objects, where each object has stuff connected to it 
-    function wallPaper(parent, x, z, rotation, imageUrl) {
+    function wallPaper(parent, x, y, z, rotation, imageUrl) {
         var mapOverlay = new THREE.TextureLoader().load(imageUrl);
-        var textureCubeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, map: mapOverlay, side: THREE.DoubleSide });
+        var textureCubeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, map: mapOverlay, side: THREE.BackSide, transparent: true });
         var geometry = new THREE.PlaneGeometry(100, 50, 1, 1);
         geometry.rotateY(rotation);
 
         var mesh = new THREE.Mesh(geometry, textureCubeMaterial);
-        mesh.position.set(x, 25, z); //starts in middle of geo's width and height
+        mesh.position.set(x, y, z); //starts in middle of geo's width and height
+        mesh.endPos = { x: x, y: y, z: z };
         parent.add(mesh);
+        mesh.change = 0;
+        mesh.lookAtPosition = new THREE.Vector3(0, y, 0);
+        textureCubeMaterial.opacity = 0;
+    }
+
+    function dotFloor(wrapper) {
+        var separation = 25;
+        var amountx = 10;
+        var amounty = 10;
+        var spriteMap = new THREE.TextureLoader().load("images/textures/disc.png");
+        var spriteMaterial = new THREE.SpriteMaterial({ map: spriteMap, color: 0x000000 });
+        wrapper.dotFloor = new THREE.Object3D();
+
+        for (var ix = 0; ix < amountx; ix++) {
+            for (var iy = 0; iy < amounty; iy++) {
+                var particle = new THREE.Sprite(spriteMaterial);
+                particle.position.x = ix * separation - ((amountx * separation) / 2);
+                particle.position.y = 0;
+                particle.position.z = iy * separation - ((amounty * separation) / 2);
+                particle.scale.x = particle.scale.y = particle.scale.z = .5;
+                wrapper.dotFloor.add(particle);
+            }
+        }
+        wrapper.dotFloor.visible = false;
+        wrapper.scene.add(wrapper.dotFloor);
+    }
+
+    function invisibleSphere(wrapper) {
+        var sphereMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(100, 3, 2), new THREE.MeshPhongMaterial());
+        wrapper.positionalObjects.push(sphereMesh);
+        wrapper.scene.add(sphereMesh);
+        sphereMesh.visible = false;
+        sphereMesh.inRange = function() {
+            transition(1);
+            wrapper.yawRotation = 0.005;
+        }
+        sphereMesh.outRange = function() {
+            transition(0);
+            wrapper.yawRotation = 0;
+
+        }
+
+
+        var sphereCount = 5;
+
+        function transition(current) {
+            for (var i = 0; i < sphereCount; i++) {
+                var object = wrapper.objects[i];
+                var endPos = current === 0 ? object.randomPos : object.circlePos;
+                new TWEEN.Tween(object.position)
+                    .to(endPos, Math.random() * 2000)
+                    .easing(TWEEN.Easing.Exponential.InOut)
+                    .start();
+            }
+
+        }
     }
 
 
     function RoomScene(sceneManager, id, clearColor, controls, camera) {
         Scene.call(this, sceneManager, id, clearColor, controls, camera);
         var that = this;
-        this.name = "MainScene";
-        var path = "images/textures/Park2/";
-        var format = '.jpg';
-        var urls = [
-            path + 'posx' + format, path + 'negx' + format,
-            path + 'posy' + format, path + 'negy' + format,
-            path + 'posz' + format, path + 'negz' + format
-        ];
+        this.name = "RoomScene";
+
         this.topLevelObject = new THREE.Object3D();
-        var topLevelObject  = this.topLevelObject;
+        this.topLevelObject.visible = false;
         this.topLevelObject.position.set(0, 0, 0);
+        this.topLevelObject.rotationSpeed = .1;
         this.scene.add(this.topLevelObject);
-        //wallPaper(topLevelObject, 200, 0, -Math.PI / 2, urls[0]);
-        // wallPaper(topLevelObject, -200, 0, -Math.PI / 2, urls[1]);
-        //wallPaper(topLevelObject, 0, -200, -Math.PI, urls[2]);
+        this.topLevelObject2 = new THREE.Object3D();
+        this.topLevelObject2.visible = false;
+        this.topLevelObject2.rotationSpeed = .1;
+
+        this.topLevelObject2.position.set(0, 0, 0);
+        this.scene.add(this.topLevelObject2);
+
+        this.cubeCamera1 = new THREE.CubeCamera(1, 1000, 256);
+        this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+        this.cubeCamera2 = new THREE.CubeCamera(1, 1000, 256);
+        this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+        this.scene.add(this.cubeCamera1);
+        this.scene.add(this.cubeCamera2);
+
 
         for (var i = 0; i < 5; i++) {
-            wallPaper(this.topLevelObject, Math.random() * 100 - 50, Math.random() * 100 - 50, -Math.PI, "images/shelter/" + i + ".png");
+            var angle = (i * 360 / 5) * Math.PI / 180;
+            wallPaper(this.topLevelObject, 100 * Math.cos(angle), 25, 100 * Math.sin(angle), -Math.PI, "images/shelter/" + i + ".png");
+        }
+        for (var i = 0; i < 5; i++) {
+            var angle = (i * 360 / 5) * Math.PI / 180;
+            wallPaper(this.topLevelObject2, 100 * Math.cos(angle + 50), 100, 100 * Math.sin(angle + 50), -Math.PI, "images/shelter/" + i + ".png");
         }
 
-        function changeWallPaper() {
+
+        this.changeWallPaper = function() {
             for (var i = 0; i < 5; i++) {
-                var child = topLevelObject.children[i];
+                var child = this.topLevelObject.children[i];
                 var mapOverlay = new THREE.TextureLoader().load("images/shelter/" + (Math.floor(Math.random() * 10)) + ".png");
                 child.material.map = mapOverlay;
                 child.material.map.needsUpdate = true;
@@ -189,11 +259,10 @@ var SCENES = (function() {
         var geometry = new THREE.PlaneGeometry(500, 500, 1, 1);
         geometry.rotateX(-Math.PI / 2);
 
-        var floorMaterial = new THREE.MeshPhongMaterial({ transparent: true });
-        var floorMaterial2 = new THREE.MeshPhongMaterial();
+        var floorMaterial = new THREE.MeshPhongMaterial({ transparent: true, color: "hsl(200, 33%, 54%)" });
 
-        var mesh = new THREE.Mesh(geometry, floorMaterial);
-        this.scene.add(mesh);
+        this.floor = new THREE.Mesh(geometry, floorMaterial);
+        this.scene.add(this.floor);
 
         var objYaw = new THREE.Object3D();
         objYaw.position.set(0, 0, 0);
@@ -201,225 +270,73 @@ var SCENES = (function() {
 
 
         this.objYaw = objYaw;
-        var geometry = new THREE.SphereBufferGeometry(4, 32, 16);
-        var sphereMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(50, 32, 16), floorMaterial2);
-        this.positionalObjects.push(sphereMesh);
-        this.scene.add(sphereMesh);
-        sphereMesh.visible = false;
-        sphereMesh.inRange = function() {
-            changeWallPaper();
-            transition(1);
-            that.yawRotation = 0.005;
-        }
-        sphereMesh.outRange = function() {
-            transition(0);
-            that.yawRotation = 0;
+        invisibleSphere(this);
+      
+        this.yawRotation = 0;
+        this.centerObjs = [];
+        this.snow = new SnowSystem();
+        this.scene.add(this.snow.obj);
 
-        }
+        this.ring = new RingSystem(0);
+        this.scene.add(this.ring.obj);
 
+        dotFloor(this);
         var sphereCount = 5;
-        this.positions = [];
-        // Random
-        for (var i = 0; i < sphereCount; i++) {
-            this.positions.push(
-                Math.random() * 160 - 80,
-                2,
-                Math.random() * 160 - 80
-            );
-        }
-        var radius = 10;
-        //circle
-        for (var i = 0; i < sphereCount; i++) {
-            var angle = (i * 72) * Math.PI / 180;
-
-            this.positions.push(
-                radius * Math.cos(angle),
-                12.5,
-                radius * Math.sin(angle)
-            );
-        }
-
-
-
 
         for (var i = 0; i < sphereCount; i++) {
-            var diffuseColor = new THREE.Color().setHSL(1, 0.5, 1 * 0.5);
-            var material = new THREE.MeshBasicMaterial({
-                color: diffuseColor,
-                reflectivity: 1,
-                shading: THREE.SmoothShading
-            });
-            var mesh = new THREE.Mesh(geometry, material);
-
-            mesh.position.x = Math.random() * 40 - 20;
-            mesh.position.y = 2;
-            mesh.position.z = Math.random() * 40 - 20;
-
-            this.objYaw.add(mesh);
-            this.objects.push(mesh);
-            mesh.onHover = function() {
-                if (this.resetTween) {
-                    this.resetTween.stop();
-                }
-                var mesh = this;
-                var start = {
-                    x: mesh.scale.x,
-                    s: mesh.rotationSpeed,
-                };
-                var target = {
-                    x: 1.25,
-                    s: 15
-                };
-                var tween = new TWEEN.Tween(start).to(target, 500);
-
-                tween.onUpdate(function() {
-                    mesh.scale.set(start.x, start.x, start.x);
-                    mesh.rotationSpeed = start.s;
-                });
-                tween.onComplete(function() {
-                    mesh.growTween = null;
-
-                });
-                this.growTween = tween;
-                tween.start();
-
-            }
-
-            mesh.offHover = function() {
-                if (this.growTween) {
-                    this.growTween.stop();
-                }
-                var mesh = this;
-                var start = {
-                    x: mesh.scale.x,
-                    s: mesh.rotationSpeed
-                };
-                var target = {
-                    x: 1,
-                    s: 1
-                };
-                var tween = new TWEEN.Tween(start).to(target, 250);
-
-                tween.onUpdate(function() {
-                    mesh.scale.set(start.x, start.x, start.x);
-                    mesh.rotationSpeed = start.s;
-                });
-                tween.onComplete(function() {
-                    mesh.resetTween = null;
-
-                });
-                this.resetTween = tween;
-
-                tween.start();
-            }
-            this.yawRotation = 0;
-
-            mesh.onClick = function() {
-
-                var start = {
-                    far: 100,
-                    saturation: 54,
-                    opacity: 100,
-                }
-                var target = {
-                    far: 600,
-                    saturation: 100,
-                    opacity: 0,
-                };
-
-                if (mesh.clicked) {
-                    floorMaterial.visible = true;
-
-                    var tween = new TWEEN.Tween(target).to(start, 1000).onUpdate(function() {
-                        floorMaterial.opacity = target.opacity;
-                        that.clearColor = new THREE.Color("hsl(200, 33%, " + target.saturation + "%)");
-                        that.scene.fog.color = new THREE.Color("hsl(200, 33%, " + target.saturation + "%)");
-                        that.scene.fog.far = target.far;
-                    }).onComplete(function() {
-                        mesh.clicked = false;
-                        dotFloor.visible = false;
-
-                    });
-                } else {
-                    var tween = new TWEEN.Tween(start).to(target, 1000).onUpdate(function() {
-                        floorMaterial.opacity = start.opacity;
-                        that.clearColor = new THREE.Color("hsl(200, 33%, " + start.saturation + "%)");
-                        that.scene.fog.color = new THREE.Color("hsl(200, 33%, " + start.saturation + "%)");
-                        that.scene.fog.far = start.far;
-                    }).onComplete(function() {
-                        floorMaterial.visible = false;
-                        dotFloor.visible = true;
-
-                        mesh.clicked = true;
-                    });
-                }
-                tween.start();
-            }
-
+            var centerObj = new CenterObject(this, new THREE.Color().setHSL(i/sphereCount, 0.5, 1 * 0.5),i,sphereCount);
+            this.objYaw.add(centerObj);
+            this.objects.push(centerObj);
         }
 
-        var separation = 25;
-        var amountx = 10;
-        var amounty = 10;
-        var spriteMap = new THREE.TextureLoader().load("images/textures/disc.png");
-        var spriteMaterial = new THREE.SpriteMaterial({ map: spriteMap, color: 0x000000 });
-        var dotFloor = new THREE.Object3D();
-
-        for (var ix = 0; ix < amountx; ix++) {
-            for (var iy = 0; iy < amounty; iy++) {
-                var particle = new THREE.Sprite(spriteMaterial);
-                particle.position.x = ix * separation - ((amountx * separation) / 2);
-                particle.position.y = 0;
-                particle.position.z = iy * separation - ((amounty * separation) / 2);
-                particle.scale.x = particle.scale.y = particle.scale.z = .5;
-                dotFloor.add(particle);
-            }
-        }
-        this.scene.add(dotFloor);
-        dotFloor.visible = false;
-
-
-        this.current = 0;
-
-        function transition(current) {
-            var offset = current * sphereCount * 3;
-            var duration = 2000;
-            for (var i = 0, j = offset; i < sphereCount; i++, j += 3) {
-                var object = that.objects[i];
-                new TWEEN.Tween(object.position)
-                    .to({
-                        x: that.positions[j],
-                        y: that.positions[j + 1],
-                        z: that.positions[j + 2]
-                    }, Math.random() * duration)
-                    .easing(TWEEN.Easing.Exponential.InOut)
-                    .start();
-            }
-
-        }
-
-
+        this.count = 0;
     }
 
     RoomScene.prototype = Object.create(Scene.prototype);
 
-    RoomScene.prototype.updateObjects = function(delta) {
+    RoomScene.prototype.updateObjects = function(delta, renderer) {
         for (var i = 0; i < this.objects.length; i++) {
             var curObj = this.objects[i];
+            curObj.visible = false;
             /*
                         curObj.rotation.x += 0.001 * curObj.rotationSpeed;
                         curObj.rotation.y += 0.001 * curObj.rotationSpeed;
                         curObj.rotation.z += 0.001 * curObj.rotationSpeed;*/
         }
+
+
+        this.snow.update();
         for (var i = 0; i < this.topLevelObject.children.length; i++) {
             var curObj = this.topLevelObject.children[i];
-            curObj.position.x += Math.random() * 10 - 5;
-            curObj.position.y += Math.random() * 10 - 5;
-            curObj.position.z += Math.random() * 10 - 5;
-            curObj.rotation.y += 0.001;
-
+            var curObj2 = this.topLevelObject2.children[i];
+            curObj.lookAt(curObj.lookAtPosition);
+            curObj2.lookAt(curObj2.lookAtPosition);
         }
+        this.topLevelObject.rotation.y += this.topLevelObject.rotationSpeed;
+        this.topLevelObject2.rotation.y -= this.topLevelObject2.rotationSpeed;
         this.objYaw.rotation.y += this.yawRotation;
+
+        // pingpong
+        for (var i = 0; i < this.objects.length; i++) {
+            var curObj = this.objects[i];
+            if (this.count % 2 === 0) {
+                curObj.update(this.cubeCamera1.renderTarget.texture);
+
+            } else {
+                curObj.update(this.cubeCamera2.renderTarget.texture);
+            }
+        }
+        if (this.count % 2 === 0) {
+            this.cubeCamera2.updateCubeMap(renderer, this.scene);
+        } else {
+            this.cubeCamera1.updateCubeMap(renderer, this.scene);
+        }
+
+        this.count++;
+        for (var i = 0; i < this.objects.length; i++) {
+            var curObj = this.objects[i];
+            curObj.visible = true;
+        }
     }
 
     function randomSpherePoint(x0, y0, z0, radius) {
@@ -691,7 +608,7 @@ var SCENES = (function() {
         this.controls = new THREE.PointerLockControls(this.camera);
         this.scene = new THREE.Scene();
 
-        this.scene.add(new THREE.AxisHelper(100));
+        //   this.scene.add(new THREE.AxisHelper(100));
         var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
 
         this.scene.add(light)
@@ -722,7 +639,7 @@ var SCENES = (function() {
         this.controls.update();
         this.checkIntersection();
         this.positionalIntersection();
-        this.updateObjects(delta);
+        this.updateObjects(delta, renderer);
         renderer.setClearColor(this.clearColor);
         if (rtt)
             renderer.render(this.scene, this.camera, this.fbo, true);
@@ -743,19 +660,19 @@ var SCENES = (function() {
                 if (this.INTERSECTED != intersects[0].object) {
                     if (this.INTERSECTED) {
                         this.INTERSECTED.offHover();
-                        $(document).off('mouseup', this.INTERSECTED.onClick);
+                        $(document).off('mouseup', this.INTERSECTED._onClick);
                         container.toggleClass("clickable");
 
                     }
                     this.INTERSECTED = intersects[0].object;
                     this.INTERSECTED.onHover();
-                    $(document).on('mouseup', this.INTERSECTED.onClick);
+                    $(document).on('mouseup', this.INTERSECTED._onClick);
                     container.toggleClass("clickable");
                 }
             } else {
                 if (this.INTERSECTED) {
                     this.INTERSECTED.offHover();
-                    $(document).off('mouseup', this.INTERSECTED.onClick);
+                    $(document).off('mouseup', this.INTERSECTED._onClick);
                     container.toggleClass("clickable");
 
                 }
@@ -764,7 +681,7 @@ var SCENES = (function() {
         } else {
             if (this.INTERSECTED) {
                 this.INTERSECTED.offHover();
-                $(document).off('mouseup', this.INTERSECTED.onClick);
+                $(document).off('mouseup', this.INTERSECTED._onClick);
                 container.toggleClass("clickable");
             }
             this.INTERSECTED = null;
