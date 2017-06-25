@@ -48,16 +48,6 @@ $(document).ready(function() {
 
     //world
     initWorld();
-
-    //lets you animate and after its done, cleans it up, look at animate.css
-    $.fn.extend({
-        animateCss: function(animationName) {
-            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            this.addClass('animated ' + animationName).one(animationEnd, function() {
-                $(this).removeClass('animated ' + animationName);
-            });
-        }
-    });
 });
 
 

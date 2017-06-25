@@ -87,7 +87,7 @@ function SceneManager(container) {
     // Link both scenes and their FBOs
     var scenes = [];
     scenes.push(new SCENES.MainScene(this, 0, 0xb3cde0));
-    scenes.push(new SCENES.RoomScene(this, 1, 0x6497b1));//hsl(200, 33%, 54%)
+    scenes.push(new SCENES.RoomScene(this, 1, 0x6497b1)); //hsl(200, 33%, 54%)
     scenes.push(new SCENES.MainScene(this, 2, 0x005b96));
     // scenes.push(new MainScene(this, 3, 0x03396c));
     scenes.push(new SCENES.MusicScene(this, 3, 0x011f4b));
@@ -199,8 +199,9 @@ SceneManager.prototype.transitionTo = function(sceneID) {
 
     var sceneManager = this;
 
-    this.tween.onUpdate(function() {
+    this.tween.onStart(function() {
         sceneManager.animateTransition = true;
+    }).onUpdate(function() {
         sceneManager.transition = position.x;
     });
     this.tween.onComplete(function() {

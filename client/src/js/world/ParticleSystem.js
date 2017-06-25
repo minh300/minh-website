@@ -1,7 +1,7 @@
 function ParticleSystem() {
-    this.particleCount = 4000;
-    this.particles = new THREE.Geometry();
-    this.pMaterial = new THREE.PointsMaterial({
+    var particleCount = 4000;
+    var particles = new THREE.Geometry();
+    var pMaterial = new THREE.PointsMaterial({
         color: 0xFFFFFF,
         size: 4,
         map: new THREE.TextureLoader().load("images/textures/particle.png"),
@@ -12,40 +12,43 @@ function ParticleSystem() {
         transparent: true
     });
 
-    this.pRadius = 10; //particle radius
+    var pRadius = 10; //particle radius
+    // now create the individual particles
+    for (var p = 0; p < particleCount; p++) {
+        var angle = (p % 360) * Math.PI / 180;
+        var pX = Math.cos(angle) * pRadius;
+        var pY = 22;
+        var pZ = Math.sin(angle) * pRadius;
+        var random = Math.random();
+        var particle = new THREE.Vector3(pX, pY, pZ);
+        particle.velocity = new THREE.Vector3(pX * random, 0, pZ * random);
+        particle.direction = new THREE.Vector3(pX / pRadius, pY / pRadius, pZ / pRadius);
+        particle.acceleration = new THREE.Vector3(.1 * particle.direction.x, 0, .1 * particle.direction.z);
+        particle.distance = 125;
+
+        // add it to the geometry
+        particles.vertices.push(particle);
+    }
+    // create the particle system
+    THREE.Points.call(this, particles, pMaterial);
+    this.name = "particleSystem";
+    this.position.y = -50;
+    this.frustumCulled = false;
+    this.particleCount = particleCount;
+    this.pRadius = pRadius; //particle radius
     this.totalWaves = 4; //divides the particle count by this
-    this.waveSize = this.particleCount / this.totalWaves;
-    this.lastWaveStart = this.particleCount - this.waveSize; //start at the last set of waves
+    this.waveSize = particleCount / this.totalWaves;
+    this.lastWaveStart = particleCount - this.waveSize; //start at the last set of waves
     this.emitPosition = { y: 22 };
     this.emitBottomPosition = { y: 22 };
     this.emitTopPosition = {};
     this.curWave = 0;
 
-    // now create the individual particles
-    for (var p = 0; p < this.particleCount; p++) {
-        var angle = (p % 360) * Math.PI / 180;
-        var pX = Math.cos(angle) * this.pRadius;
-        var pY = 22;
-        var pZ = Math.sin(angle) * this.pRadius;
-        var random = p > this.lastWaveStart ? Math.random() : 1
-        var particle = new THREE.Vector3(pX, pY, pZ);
-        particle.velocity = new THREE.Vector3(pX * random, 0, pZ * random);
-        particle.direction = new THREE.Vector3(pX / this.pRadius, pY / this.pRadius, pZ / this.pRadius);
-        particle.acceleration = new THREE.Vector3(.1 * particle.direction.x, 0, .1 * particle.direction.z);
-        particle.distance = 125;
-
-        // add it to the geometry
-        this.particles.vertices.push(particle);
-    }
-    // create the particle system
-    this.obj = new THREE.Points(
-        this.particles,
-        this.pMaterial);
-    this.obj.name = "particleSystem";
-    this.obj.position.y = -50;
-    this.obj.frustumCulled = false;
 }
 
+ParticleSystem.prototype = Object.create(THREE.Points.prototype);
+
+ParticleSystem.prototype.constructor = ParticleSystem;
 
 ParticleSystem.prototype.update = function(avgFrequency, audioData, pulse) {
     if (audioManager.isPlaying()) {
@@ -57,7 +60,7 @@ ParticleSystem.prototype.update = function(avgFrequency, audioData, pulse) {
 
         for (var pCount = 0; pCount < this.particleCount; pCount++) {
             // get the particle
-            var particle = this.particles.vertices[pCount];
+            var particle = this.geometry.vertices[pCount];
 
             //only uses 1 wave
             if (pCount >= this.lastWaveStart && avgFrequency > 60) {
@@ -115,7 +118,7 @@ ParticleSystem.prototype.update = function(avgFrequency, audioData, pulse) {
             this.curWave = (this.curWave + 1) % (this.totalWaves - 1);
         }
 
-        this.particles.verticesNeedUpdate = true;
+        this.geometry.verticesNeedUpdate = true;
 
     }
 }
@@ -145,9 +148,9 @@ ParticleSystem.prototype.onCompleteParticleSystem = function(audioInfo) {
 
 
 function SnowSystem() {
+    THREE.Object3D.call(this);
     this.particleCount = 4000;
-    this.obj = new THREE.Object3D();
-    this.obj.name = "SnowSystem";
+    this.name = "SnowSystem";
     for (var i = 1; i < 4; i++) {
         var geometry = new THREE.Geometry();
         var material = new THREE.PointsMaterial({
@@ -165,7 +168,6 @@ function SnowSystem() {
             var pX = Math.random() * 250 - 125;
             var pY = Math.random() * 300;
             var pZ = Math.random() * 250 - 125;
-            var random = p > this.lastWaveStart ? Math.random() : 1
             var particle = new THREE.Vector3(pX, pY, pZ);
             particle.velocity = new THREE.Vector3(0, Math.random() * .25 + .25, 0);
 
@@ -176,15 +178,19 @@ function SnowSystem() {
             geometry,
             material);
         points.frustumCulled = false;
-        this.obj.add(points);
+        this.add(points);
     }
 
 
 }
 
+SnowSystem.prototype = Object.create(THREE.Object3D.prototype);
+
+SnowSystem.prototype.constructor = SnowSystem;
+
 SnowSystem.prototype.update = function(delta) {
-    for (var i = 0, l = this.obj.children.length; i < l; i++) {
-        var cur = this.obj.children[i].geometry;
+    for (var i = 0, l = this.children.length; i < l; i++) {
+        var cur = this.children[i].geometry;
         for (var pCount = 0; pCount < this.particleCount / l; pCount++) {
             // get the particle
             var particle = cur.vertices[pCount];
@@ -206,9 +212,9 @@ SnowSystem.prototype.update = function(delta) {
 
 
 function RingSystem(rotation) {
-    this.particleCount = 200;
-    this.particles = new THREE.Geometry();
-    this.pMaterial = new THREE.PointsMaterial({
+    var particleCount = 200;
+    var particles = new THREE.Geometry();
+    var pMaterial = new THREE.PointsMaterial({
         color: 0xFFFFFF,
         size: 4,
         map: new THREE.TextureLoader().load("images/textures/particle.png"),
@@ -219,44 +225,47 @@ function RingSystem(rotation) {
         transparent: true
     });
 
-    this.pRadius = 14; //particle radius
-    this.ringPositions = [];
-    this.outterRingPositions = [];
+    var pRadius = 14; //particle radius
+    var ringPositions = [];
+    var outterRingPositions = [];
 
     // now create the individual particles
-    for (var p = 0; p < this.particleCount; p++) {
-        var angle = (p * 360 / this.particleCount) * Math.PI / 180;
+    for (var p = 0; p < particleCount; p++) {
+        var angle = (p * 360 / particleCount) * Math.PI / 180;
 
-        var pX = Math.cos(angle) * this.pRadius;
+        var pX = Math.cos(angle) * pRadius;
         var pY = 12.5;
-        var pZ = Math.sin(angle) * this.pRadius;
-        this.ringPositions.push({ x: pX, y: pY, z: pZ });
-        this.outterRingPositions.push({ x: pX * 10, y: pY, z: pZ * 10 });
+        var pZ = Math.sin(angle) * pRadius;
+        ringPositions.push({ x: pX, y: pY, z: pZ });
+        outterRingPositions.push({ x: pX * 10, y: pY, z: pZ * 10 });
         var particle = new THREE.Vector3(Math.random() * 500 - 250, Math.random() * 500 - 250, Math.random() * 500 - 250);
 
         // add it to the geometry
-        this.particles.vertices.push(particle);
+        particles.vertices.push(particle);
     }
 
-
     // create the particle system
-    this.obj = new THREE.Points(
-        this.particles,
-        this.pMaterial);
-    this.obj.name = "RingSystem";
-    this.obj.position.y = 0;
-    this.obj.frustumCulled = false;
-    this.obj.visible = false;
-     this.obj.rotation.z = rotation;
+    THREE.Points.call(this, particles, pMaterial);
+    this.name = "RingSystem";
+    this.position.y = 0;
+    this.frustumCulled = false;
+    this.visible = false;
+    this.rotation.z = rotation;
+    this.ringPositions = ringPositions;
+    this.outterRingPositions = outterRingPositions;
+    this.particleCount = particleCount;
 }
+RingSystem.prototype = Object.create(THREE.Points.prototype);
+
+RingSystem.prototype.constructor = RingSystem;
 
 RingSystem.prototype.update = function() {
-    this.obj.visible = true;
+    this.visible = true;
 
     var duration = 2000;
     var me = this;
     for (var i = 0; i < this.particleCount; i++) {
-        var particle = this.particles.vertices[i];
+        var particle = this.geometry.vertices[i];
         var startTween = new TWEEN.Tween(particle)
             .to({
                 x: me.ringPositions[i].x,
@@ -264,10 +273,10 @@ RingSystem.prototype.update = function() {
                 z: me.ringPositions[i].z
             }, 1750)
             .easing(TWEEN.Easing.Exponential.InOut).onUpdate(function() {
-                me.particles.verticesNeedUpdate = true;
-                me.obj.rotation.y += .001;
-               // me.obj.rotation.x += Math.random() * .001 - .0005;
-               // me.obj.rotation.z += Math.random() * .001 - .0005;
+                me.geometry.verticesNeedUpdate = true;
+                me.rotation.y += .001;
+                // me.rotation.x += Math.random() * .001 - .0005;
+                // me.rotation.z += Math.random() * .001 - .0005;
 
             });
 
@@ -278,24 +287,22 @@ RingSystem.prototype.update = function() {
                 z: me.outterRingPositions[i].z
             }, 500)
             .easing(TWEEN.Easing.Exponential.InOut).onUpdate(function() {
-                me.particles.verticesNeedUpdate = true;
+                me.geometry.verticesNeedUpdate = true;
             });
 
         startTween.chain(endTween).start();
     }
-
-
-
-
 }
+
+
 
 RingSystem.prototype.resetPosition = function() {
     for (var i = 0; i < this.particleCount; i++) {
-        var particle = this.particles.vertices[i];
+        var particle = this.geometry.vertices[i];
         particle.x = Math.random() * 500 - 250;
         particle.y = Math.random() * 500 - 250;
         particle.z = Math.random() * 500 - 250;
     }
-    this.particles.verticesNeedUpdate = true;
-    this.obj.visible = false;
+    this.geometry.verticesNeedUpdate = true;
+    this.visible = false;
 }

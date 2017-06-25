@@ -73,16 +73,17 @@ var VISUALOBJECTS = (function() {
     }
 
     function SphericalObject(radius, count, heaxgonSize, opacity, name, pos) {
-        var obj = new THREE.Object3D();
-        obj.name = name;
+        THREE.Object3D.call(this);
+
+        this.name = name;
         if (pos) {
-            obj.position.set(pos.x, pos.y, pos.z);
+            this.position.set(pos.x, pos.y, pos.z);
         } else {
-            obj.position.set(0, 0, 0);
+            this.position.set(0, 0, 0);
         }
 
-        addChildrenFromSphere(obj, radius, count, heaxgonSize, opacity);
-        this.obj = obj;
+        addChildrenFromSphere(this, radius, count, heaxgonSize, opacity);
+
         this.topIndexFunction = function(i, l) {
             return i;
         };
@@ -100,8 +101,8 @@ var VISUALOBJECTS = (function() {
                 total += dataArray[i];
                 var topIndex = this.topIndexFunction(i, l);
                 var botIndex = this.botIndexFunction(i, l);
-                var inChild1 = this.obj.children[topIndex];
-                var inChild2 = this.obj.children[botIndex];
+                var inChild1 = this.children[topIndex];
+                var inChild2 = this.children[botIndex];
 
                 var val = Math.pow((dataArray[i] / 255), 2) * 255;
                 val *= i > 42 ? 1.1 : 1;
@@ -172,7 +173,9 @@ var VISUALOBJECTS = (function() {
         }
 
     }
+    SphericalObject.prototype = Object.create(THREE.Object3D.prototype);
 
+    SphericalObject.prototype.constructor = SphericalObject;
 
 
 
@@ -180,7 +183,7 @@ var VISUALOBJECTS = (function() {
 
     function Heart(radius, count, heaxgonSize, opacity, name) {
         SphericalObject.call(this, radius, count, heaxgonSize, opacity, name);
-        this.obj.rotation.x = (-Math.PI / 2);
+        this.rotation.x = (-Math.PI / 2);
         this.topIndexFunction = function(i, l) {
             return i + l;
         };
@@ -206,7 +209,7 @@ var VISUALOBJECTS = (function() {
 
     function Staff(radius, count, heaxgonSize, opacity, name) {
         SphericalObject.call(this, radius, count, heaxgonSize, opacity, name);
-        this.obj.rotation.z = (-Math.PI / 2);
+        this.rotation.z = (-Math.PI / 2);
 
         this.botIndexFunction = function(i, l) {
             return l * 2 - i - 1;
@@ -237,8 +240,8 @@ var VISUALOBJECTS = (function() {
                 var topIndex = i + l;
                 var botIndex = l - i - 1;
 
-                var outChild1 = this.obj.children[topIndex];
-                var outChild2 = this.obj.children[botIndex];
+                var outChild1 = this.children[topIndex];
+                var outChild2 = this.children[botIndex];
 
                 var val = Math.pow((dataArray[i] / 255), 2) * 255;
                 val *= i > 42 ? 1.1 : 1;
@@ -261,9 +264,9 @@ var VISUALOBJECTS = (function() {
             } //end of for
             if (transforming) {
 
-                this.obj.rotation.y += .05;
+                this.rotation.y += .05;
             } else {
-                this.obj.rotation.y += 0.005;
+                this.rotation.y += 0.005;
 
             }
         }
@@ -284,10 +287,10 @@ var VISUALOBJECTS = (function() {
 
     function Flower(radius, count, heaxgonSize, opacity, name) {
         SphericalObject.call(this, radius, count, heaxgonSize, opacity, name, { x: 0, y: -40, z: 0 });
-        for (var i = this.obj.children.length / 2, l = this.obj.children.length; i < l; i++) {
-            this.obj.children[i].visible = false;
+        for (var i = this.children.length / 2, l = this.children.length; i < l; i++) {
+            this.children[i].visible = false;
         }
-        this.obj.rotation.x = (Math.PI);
+        this.rotation.x = (Math.PI);
 
         this.botIndexFunction = function(i, l) {
             return l * 2 - i - 1;
@@ -312,15 +315,15 @@ var VISUALOBJECTS = (function() {
     function Spiral(radius, count, heaxgonSize, opacity, name) {
         SphericalObject.call(this, radius, count, heaxgonSize, opacity, name);
 
-        for (var i = this.obj.children.length / 2, l = this.obj.children.length; i < l; i++) {
-            this.obj.children[i].visible = false;
+        for (var i = this.children.length / 2, l = this.children.length; i < l; i++) {
+            this.children[i].visible = false;
         }
-        this.obj.rotation.x = (-Math.PI / 2);
+        this.rotation.x = (-Math.PI / 2);
 
         this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
 
             for (var i = 0, l = dataArray.length; i < l; i++) {
-                var inChild1 = this.obj.children[l - i - 1];
+                var inChild1 = this.children[l - i - 1];
 
                 var val = Math.pow((dataArray[i] / 255), 2) * 255;
                 val *= i > 42 ? 1.1 : 1;
@@ -392,9 +395,9 @@ var VISUALOBJECTS = (function() {
 
 
     function Fountain(radius, count, heaxgonSize, opacity, name) {
-        var obj = new THREE.Object3D();
-        obj.name = name;
-        obj.position.set(0, -35, 0);
+        THREE.Object3D.call(this);
+        this.name = name;
+        this.position.set(0, -35, 0);
 
         for (var i = 1, l = count; i <= l; i++) {
             var geometry = getShape(6, heaxgonSize);
@@ -417,16 +420,14 @@ var VISUALOBJECTS = (function() {
             mesh.rotation.x = (-Math.PI / 2);
             mesh.base = mesh.position.x;
             mesh.base2 = mesh.position.y;
-            obj.add(mesh);
+            this.add(mesh);
         }
-        obj.rotation.y = (Math.PI / 2);
-
-        this.obj = obj;
+        this.rotation.y = (Math.PI / 2);
 
         this.update = function(avgFrequency, dataArray, decay, transforming, to, opacity) {
 
             for (var i = dataArray.length - 1, l = 0; i >= l; i--) {
-                var inChild1 = this.obj.children[i];
+                var inChild1 = this.children[i];
 
                 var val = Math.pow((dataArray[i] / 255), 2) * 255;
                 val *= i > 42 ? 1.1 : 1;
@@ -485,6 +486,10 @@ var VISUALOBJECTS = (function() {
 
         }
     }
+
+    Fountain.prototype = Object.create(THREE.Object3D.prototype);
+
+    Fountain.prototype.constructor = SphericalObject;
 
     return { Heart: Heart, Staff: Staff, Spiral: Spiral, Flower: Flower, Fountain: Fountain, OutterSphere: OutterSphere };;
 })();

@@ -1,4 +1,5 @@
 angular.module('directives.scroll', []).directive("scroll", function() {
+    var transitionThottler;
     return {
         link: function($scope, element, attrs) {
             var vm = $scope.vm;
@@ -9,7 +10,10 @@ angular.module('directives.scroll', []).directive("scroll", function() {
                 if (newIndex != vm.tabIndex) {
                     vm.tabIndex = newIndex;
                     if (!sceneManager.specialAnimate) {
-                        sceneManager.transitionTo(newIndex);
+                        if (transitionThottler) {
+                            clearTimeout(transitionThottler);
+                        }
+                        transitionThottler = setTimeout(function() {  sceneManager.transitionTo(newIndex); }, 500);
                     }
                     $scope.$apply();
                 }

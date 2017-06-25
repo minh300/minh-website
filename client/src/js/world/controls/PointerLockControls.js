@@ -180,10 +180,13 @@ THREE.PointerLockControls.prototype.onKeyUp = function(event) {
 };
 
 THREE.PointerLockControls.prototype.update = function() {
-    if (this.enabled === false) return;
-
     var time = performance.now();
     var delta = (time - this.prevTime) / 1000;
+    this.prevTime = time;
+
+    if (this.enabled === false) return;
+
+
     if (!sceneManager.animateTransition) {
 
         this.velocity.x -= this.velocity.x * 10.0 * delta;
@@ -209,8 +212,8 @@ THREE.PointerLockControls.prototype.update = function() {
 
     } else {
         this.moveForward = this.moveRight = this.moveLeft = this.moveBackward = false;
+        this.velocity.x = this.velocity.y = this.velocity.z = 0;
     }
-    this.prevTime = time;
 }
 THREE.PointerLockControls.prototype.moveTo = function(x, y, z) {
     this.moveForward = true;
