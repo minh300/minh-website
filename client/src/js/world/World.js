@@ -50,6 +50,7 @@
             fgContainer.height(SCREEN_HEIGHT - 42); //42 is constant size of navigation panel
             sceneManager.resizeWindows(SCREEN_WIDTH, SCREEN_HEIGHT);
         }
+        var lastLoop = new Date;
 
         function animate() {
             requestAnimationFrame(animate);

@@ -9,7 +9,7 @@ function CenterObject(wrapper, angle, objProperties) {
 
     THREE.Mesh.call(this, geometry, material);
     this.name = objProperties.name;
-    this.textureCube = objProperties.textureCube;
+    this.textureCube = CenterObject.newAnimeTextureCube;
     this.randomPos = {
         x: Math.random() * 160 - 80,
         y: 2,
@@ -66,6 +66,26 @@ CenterObject.prototype = Object.create(THREE.Mesh.prototype);
 
 CenterObject.prototype.constructor = CenterObject;
 
+CenterObject.newAnimeTextureCube = (function() {
+    var size = 48;
+    return function() {
+        var unqieArray = [];
+
+        var loader = new THREE.CubeTextureLoader()
+            .setPath('images/textures/anime/');
+
+        var index = Math.floor(Math.random() * size);
+
+        while (unqieArray.length !== 6) {
+            if (unqieArray.indexOf(index + '.png') === -1) {
+                unqieArray.push(index + '.png');
+            }
+            index = Math.floor(Math.random() * size);
+        }
+        return loader.load(unqieArray);
+    }
+}());
+
 function InvisibleSphere(wrapper) {
     THREE.Mesh.call(this, new THREE.SphereBufferGeometry(100, 3, 2), new THREE.MeshPhongMaterial());
     this.visible = false;
@@ -90,9 +110,7 @@ function CenterObjectContainer(wrapper, sphereCount) {
     this.yawRotation = 0;
     var objProperties = [{
             name: "anime",
-            textureCube: new THREE.CubeTextureLoader()
-                .setPath('images/textures/anime/')
-                .load(['1.png', '2.png', '3.png', '1.png', '2.png', '3.png']),
+            textureCube: CenterObject.newAnimeTextureCube(),
             color: new THREE.Color().setHSL(0, 0.5, 0.5)
         },
         { name: "work", textureCube: null, color: new THREE.Color().setHSL(1 / 5, 0.5, 0.5) },
@@ -159,7 +177,7 @@ function CenterObjectContainer(wrapper, sphereCount) {
 
             before.onComplete(function() {
                 wrapper.transitioning = false;
-                clickedObj.material.envMap = clickedObj.textureCube;
+                clickedObj.material.envMap = clickedObj.textureCube();
                 clickedObj.material.transparent = false;
                 clickedObj.material.needsUpdate = true;
                 me.miniScene = null;
@@ -339,13 +357,13 @@ function WallPaper(x, y, z, rotation, mapOverlay) {
     this.lookAtPosition = new THREE.Vector3(0, y, 0);
     textureCubeMaterial.opacity = 0;
     this.startTime = clock.getElapsedTime();
-    this.changeInterval = Math.random() * 50 + 10;
+    this.changeInterval = Math.random() * 40 + 20;
     this.changing = false;
 }
 
 WallPaper.newAnimeWallpaper = (function() {
     var unqieArray = [];
-    var size = 15;
+    var size = 48;
     var totalWallpapers = 10;
     return function() {
         var index = Math.floor(Math.random() * size);
@@ -374,7 +392,7 @@ WallPaper.prototype.update = function() {
     if (currentTime > this.changeInterval && !this.changing) {
         this.changing = true;
         this.startTime = clock.getElapsedTime();
-        this.changeInterval = Math.random() * 50 + 10;
+        this.changeInterval = Math.random() * 40 + 20;
         var mapOverlay = WallPaper.newAnimeWallpaper();
 
         var me = this;
